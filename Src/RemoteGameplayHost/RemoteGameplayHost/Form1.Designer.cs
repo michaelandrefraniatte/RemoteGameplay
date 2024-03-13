@@ -170,6 +170,7 @@
             this.FormClosed += new System.Windows.Forms.FormClosedEventHandler(this.RemoteGameplayHost_FormClosed);
             this.Load += new System.EventHandler(this.RemoteGameplayHost_Load);
             this.Shown += new System.EventHandler(this.RemoteGameplayHost_Shown);
+            this.KeyDown += new System.Windows.Forms.KeyEventHandler(this.Form1_KeyDown);
             this.ResumeLayout(false);
             this.PerformLayout();
 

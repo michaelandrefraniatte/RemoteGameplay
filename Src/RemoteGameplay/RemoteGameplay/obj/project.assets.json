@@ -7860,11 +7860,11 @@
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "C:\\Users\\micha\\Documents\\Perso\\tool\\RemoteGameplay\\Src\\V2\\RemoteGameplay\\RemoteGameplay\\RemoteGameplay.csproj",
+      "projectUniqueName": "C:\\Users\\micha\\Documents\\github\\ProGamingMapper\\Src\\RemoteGameplay\\RemoteGameplay\\RemoteGameplay\\RemoteGameplay.csproj",
       "projectName": "RemoteGameplay",
-      "projectPath": "C:\\Users\\micha\\Documents\\Perso\\tool\\RemoteGameplay\\Src\\V2\\RemoteGameplay\\RemoteGameplay\\RemoteGameplay.csproj",
+      "projectPath": "C:\\Users\\micha\\Documents\\github\\ProGamingMapper\\Src\\RemoteGameplay\\RemoteGameplay\\RemoteGameplay\\RemoteGameplay.csproj",
       "packagesPath": "C:\\Users\\micha\\.nuget\\packages\\",
-      "outputPath": "C:\\Users\\micha\\Documents\\Perso\\tool\\RemoteGameplay\\Src\\V2\\RemoteGameplay\\RemoteGameplay\\obj\\",
+      "outputPath": "C:\\Users\\micha\\Documents\\github\\ProGamingMapper\\Src\\RemoteGameplay\\RemoteGameplay\\RemoteGameplay\\obj\\",
       "projectStyle": "PackageReference",
       "fallbackFolders": [
         "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
@@ -7933,7 +7933,7 @@
             "privateAssets": "none"
           }
         },
-        "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\7.0.203\\RuntimeIdentifierGraph.json"
+        "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\8.0.100\\RuntimeIdentifierGraph.json"
       }
     }
   }
