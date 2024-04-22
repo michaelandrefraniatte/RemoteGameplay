@@ -11,3 +11,16 @@ C:\Users\micha\Documents\Perso\tool\RemoteGameplay\Src\RemoteGameplayHost\Remote
 C:\Users\micha\Documents\Perso\tool\RemoteGameplay\Src\RemoteGameplayHost\RemoteGameplayHost\obj\Release\RemoteGameplayHost.exe
 C:\Users\micha\Documents\Perso\tool\RemoteGameplay\Src\RemoteGameplayHost\RemoteGameplayHost\obj\Release\RemoteGameplayHost.pdb
 C:\Users\micha\Documents\Perso\tool\RemoteGameplay\Src\RemoteGameplayHost\RemoteGameplayHost\obj\Release\RemoteGameplayHost.Form1.resources
+C:\Users\micha\Documents\github\RemoteGameplay\Src\V1\RemoteGameplayHost\RemoteGameplayHost\bin\Release\RemoteGameplayHost.exe.config
+C:\Users\micha\Documents\github\RemoteGameplay\Src\V1\RemoteGameplayHost\RemoteGameplayHost\bin\Release\RemoteGameplayHost.exe
+C:\Users\micha\Documents\github\RemoteGameplay\Src\V1\RemoteGameplayHost\RemoteGameplayHost\bin\Release\RemoteGameplayHost.pdb
+C:\Users\micha\Documents\github\RemoteGameplay\Src\V1\RemoteGameplayHost\RemoteGameplayHost\obj\Release\RemoteGameplayHost.csproj.AssemblyReference.cache
+C:\Users\micha\Documents\github\RemoteGameplay\Src\V1\RemoteGameplayHost\RemoteGameplayHost\obj\Release\RemoteGameplayHost.csproj.SuggestedBindingRedirects.cache
+C:\Users\micha\Documents\github\RemoteGameplay\Src\V1\RemoteGameplayHost\RemoteGameplayHost\obj\Release\RemoteGameplayHost.exe.config
+C:\Users\micha\Documents\github\RemoteGameplay\Src\V1\RemoteGameplayHost\RemoteGameplayHost\obj\Release\RemoteGameplayHost.Form1.resources
+C:\Users\micha\Documents\github\RemoteGameplay\Src\V1\RemoteGameplayHost\RemoteGameplayHost\obj\Release\RemoteGameplayHost.Properties.Resources.resources
+C:\Users\micha\Documents\github\RemoteGameplay\Src\V1\RemoteGameplayHost\RemoteGameplayHost\obj\Release\RemoteGameplayHost.csproj.GenerateResource.cache
+C:\Users\micha\Documents\github\RemoteGameplay\Src\V1\RemoteGameplayHost\RemoteGameplayHost\obj\Release\RemoteGameplayHost.csproj.CoreCompileInputs.cache
+C:\Users\micha\Documents\github\RemoteGameplay\Src\V1\RemoteGameplayHost\RemoteGameplayHost\obj\Release\RemoteGa.76E0CB92.Up2Date
+C:\Users\micha\Documents\github\RemoteGameplay\Src\V1\RemoteGameplayHost\RemoteGameplayHost\obj\Release\RemoteGameplayHost.exe
+C:\Users\micha\Documents\github\RemoteGameplay\Src\V1\RemoteGameplayHost\RemoteGameplayHost\obj\Release\RemoteGameplayHost.pdb
