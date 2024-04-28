@@ -99,22 +99,16 @@ namespace RemoteGameplay
                 wasapi = mmdevice;
                 break;
             }
-            soundOut = new WasapiOut(wasapi, AudioClientShareMode.Exclusive, false, 1);
+            soundOut = new WasapiOut(wasapi, AudioClientShareMode.Exclusive, false, 0);
             src = new BufferedWaveProvider(soundOut.OutputWaveFormat);
             soundOut.Init(src);
             soundOut.Play();
         }
         private void Ws_OnMessageAudio(object sender, MessageEventArgs e)
         {
-            DataAudio = TrimEndAudio(e.RawData);
+            DataAudio = e.RawData;
             if (DataAudio.Length > 0)
                 src.AddSamples(DataAudio, 0, DataAudio.Length);
-        }
-        public byte[] TrimEndAudio(byte[] array)
-        {
-            int lastIndex = Array.FindLastIndex(array, b => b != 0);
-            Array.Resize(ref array, lastIndex + 1);
-            return array;
         }
         public void DisconnectAudio()
         {
@@ -139,13 +133,7 @@ namespace RemoteGameplay
         }
         private void Ws_OnMessageDisplay(object sender, MessageEventArgs e)
         {
-            DataDisplay = TrimEndDisplay(e.RawData);
-        }
-        public byte[] TrimEndDisplay(byte[] array)
-        {
-            int lastIndex = Array.FindLastIndex(array, b => b != 0);
-            Array.Resize(ref array, lastIndex + 1);
-            return array;
+            DataDisplay = e.RawData;
         }
         public void DisconnectDisplay()
         {

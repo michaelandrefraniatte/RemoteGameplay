@@ -147,8 +147,14 @@ namespace RemoteGameplayHost
                 {
                     byte[] rawdata = new byte[e.BytesRecorded];
                     Array.Copy(e.Buffer, 0, rawdata, 0, e.BytesRecorded);
-                    rawdataavailable = rawdata;
+                    rawdataavailable = TrimEndAudio(rawdata);
                 }
+            }
+            public static byte[] TrimEndAudio(byte[] array)
+            {
+                int lastIndex = Array.FindLastIndex(array, b => b != 0);
+                Array.Resize(ref array, lastIndex + 1);
+                return array;
             }
         }
         public class Audio : WebSocketBehavior
@@ -178,19 +184,25 @@ namespace RemoteGameplayHost
             public static WebSocketServer wss;
             public static byte[] rawdataavailable;
             public static int width = 0, height = 0;
-            public static ImageCodecInfo jpegEncoder;
-            public static EncoderParameters encoderParameters;
-            public static int jpegQuality;
+            public static ImageCodecInfo myImageCodecInfo;
+            public static Encoder myEncoder;
+            public static EncoderParameter myEncoderParameter;
+            public static EncoderParameters myEncoderParameters;
+            public static Bitmap img;
+            public static Graphics graphics;
+            public static Bitmap output;
+            public static Graphics g;
             public static void Connect()
             {
                 try
                 {
                     width = Form1.width;
                     height = Form1.height;
-                    jpegEncoder = ImageCodecInfo.GetImageDecoders().First(c => c.FormatID == ImageFormat.Jpeg.Guid);
-                    encoderParameters = new EncoderParameters(1);
-                    jpegQuality = 30;
-                    encoderParameters.Param[0] = new EncoderParameter(System.Drawing.Imaging.Encoder.Quality, jpegQuality);
+                    myImageCodecInfo = GetEncoderInfo("image/jpeg");
+                    myEncoder = Encoder.Quality;
+                    myEncoderParameters = new EncoderParameters(1);
+                    myEncoderParameter = new EncoderParameter(myEncoder, 25L);
+                    myEncoderParameters.Param[0] = myEncoderParameter;
                     localip = Form1.localip;
                     port = Form1.displayport;
                     String connectionString = "ws://" + localip + ":" + port;
@@ -201,10 +213,26 @@ namespace RemoteGameplayHost
                 catch { }
                 Task.Run(() => taskSend());
             }
+            private static ImageCodecInfo GetEncoderInfo(String mimeType)
+            {
+                int j;
+                ImageCodecInfo[] encoders;
+                encoders = ImageCodecInfo.GetImageEncoders();
+                for (j = 0; j < encoders.Length; ++j)
+                {
+                    if (encoders[j].MimeType == mimeType)
+                        return encoders[j];
+                }
+                return null;
+            }
             public static void Disconnect()
             {
                 wss.RemoveWebSocketService("/Display");
                 wss.Stop();
+                img.Dispose();
+                graphics.Dispose();
+                output.Dispose();
+                g.Dispose();
             }
             public static void taskSend()
             {
@@ -212,34 +240,36 @@ namespace RemoteGameplayHost
                 {
                     try
                     {
-                        Bitmap img = new Bitmap(System.Windows.Forms.Screen.PrimaryScreen.Bounds.Width, System.Windows.Forms.Screen.PrimaryScreen.Bounds.Height);
-                        Graphics graphics = Graphics.FromImage(img as System.Drawing.Image);
+                        img = new Bitmap(Screen.PrimaryScreen.Bounds.Width, Screen.PrimaryScreen.Bounds.Height);
+                        graphics = Graphics.FromImage(img);
                         graphics.PixelOffsetMode = PixelOffsetMode.HighSpeed;
                         graphics.SmoothingMode = SmoothingMode.HighSpeed;
-                        graphics.InterpolationMode = System.Drawing.Drawing2D.InterpolationMode.Low;
+                        graphics.InterpolationMode = InterpolationMode.Low;
                         graphics.CompositingMode = CompositingMode.SourceCopy;
                         graphics.CompositingQuality = CompositingQuality.HighSpeed;
                         graphics.CopyFromScreen(0, 0, 0, 0, img.Size);
-                        Bitmap output = new Bitmap(width, height);
-                        Graphics g = Graphics.FromImage(output);
+                        output = new Bitmap(width, height);
+                        g = Graphics.FromImage(output);
                         g.DrawImage(img, 0, 0, width, height);
                         rawdataavailable = BitmapToByteArray(output);
-                        img.Dispose();
-                        graphics.Dispose();
-                        output.Dispose();
-                        g.Dispose();
                     }
                     catch { }
-                    System.Threading.Thread.Sleep(40);
+                    System.Threading.Thread.Sleep(30);
                 }
             }
             public static byte[] BitmapToByteArray(Bitmap img)
             {
                 using(var stream = new MemoryStream())
                 {
-                    img.Save(stream, jpegEncoder, encoderParameters);
-                    return stream.ToArray();
+                    img.Save(stream, myImageCodecInfo, myEncoderParameters);
+                    return TrimEndDisplay(stream.ToArray());
                 }
+            }
+            public static byte[] TrimEndDisplay(byte[] array)
+            {
+                int lastIndex = Array.FindLastIndex(array, b => b != 0);
+                Array.Resize(ref array, lastIndex + 1);
+                return array;
             }
         }
         public class Display : WebSocketBehavior
