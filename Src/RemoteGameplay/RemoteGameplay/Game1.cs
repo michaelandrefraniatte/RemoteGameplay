@@ -16,13 +16,13 @@ namespace RemoteGameplay
         private GraphicsDeviceManager _graphics;
         private Microsoft.Xna.Framework.Graphics.SpriteBatch _spriteBatch;
         private string ip, displayport, audioport;
-        private WebSocket wscaudio, wsc1display, wsc2display;
+        private WebSocket wscaudio, wsc1display, wsc2display, wsc3display, wsc4display;
         private BufferedWaveProvider src;
         private WasapiOut soundOut;
         private int width = Screen.PrimaryScreen.Bounds.Width;
         private int height = Screen.PrimaryScreen.Bounds.Height;
-        private Texture2D texture1 = null, texture1temp = null, texture2 = null, texture2temp = null;
-        private byte[] Data1Display = null, Data2Display = null, DataAudio = null;
+        private Texture2D texture1 = null, texture1temp = null, texture2 = null, texture2temp = null, texture3 = null, texture3temp = null, texture4 = null, texture4temp = null;
+        private byte[] Data1Display = null, Data2Display = null, Data3Display = null, Data4Display = null, DataAudio = null;
         public Game1()
         {
             _graphics = new GraphicsDeviceManager(this);
@@ -44,12 +44,16 @@ namespace RemoteGameplay
             }
             Connect1Display();
             Connect2Display();
+            Connect3Display();
+            Connect4Display();
             ConnectAudio();
         }
         public void ClosingForm(object sender, System.ComponentModel.CancelEventArgs e)
         {
             Disconnect1Display();
             Disconnect2Display();
+            Disconnect3Display();
+            Disconnect4Display();
             DisconnectAudio();
         }
         protected override void Initialize()
@@ -62,8 +66,8 @@ namespace RemoteGameplay
         }
         protected override void Update(GameTime gameTime)
         {
-            if (GamePad.GetState(PlayerIndex.One).Buttons.Back == Microsoft.Xna.Framework.Input.ButtonState.Pressed || Keyboard.GetState().IsKeyDown(Microsoft.Xna.Framework.Input.Keys.Escape))
-                Exit();
+            /*if (GamePad.GetState(PlayerIndex.One).Buttons.Back == Microsoft.Xna.Framework.Input.ButtonState.Pressed || Keyboard.GetState().IsKeyDown(Microsoft.Xna.Framework.Input.Keys.Escape))
+                Exit();*/
             base.Update(gameTime);
         }
         protected override void Draw(GameTime gameTime)
@@ -72,10 +76,14 @@ namespace RemoteGameplay
             {
                 texture1temp = texture1;
                 texture2temp = texture2;
+                texture3temp = texture3;
+                texture4temp = texture4;
                 GraphicsDevice.Clear(Color.White);
                 _spriteBatch.Begin();
-                _spriteBatch.Draw(texture1temp, new Vector2(0, 0), new Rectangle(0, 0, width, height / 2), Color.White);
-                _spriteBatch.Draw(texture2temp, new Vector2(0, height / 2), new Rectangle(0, 0, width, height / 2), Color.White);
+                _spriteBatch.Draw(texture1temp, new Vector2(0, 0), new Rectangle(0, 0, width, height / 4), Color.White);
+                _spriteBatch.Draw(texture2temp, new Vector2(0, height * 1 / 4), new Rectangle(0, 0, width, height / 4), Color.White);
+                _spriteBatch.Draw(texture3temp, new Vector2(0, height * 2 / 4), new Rectangle(0, 0, width, height / 4), Color.White);
+                _spriteBatch.Draw(texture4temp, new Vector2(0, height * 3 / 4), new Rectangle(0, 0, width, height / 4), Color.White);
                 _spriteBatch.End();
                 base.Draw(gameTime);
                 System.Threading.Thread.Sleep(30);
@@ -172,12 +180,66 @@ namespace RemoteGameplay
         {
             wsc2display.Close();
         }
+        public void Connect3Display()
+        {
+            String connectionString = "ws://" + ip + ":" + (Convert.ToInt32(displayport) + 2).ToString() + "/3Display";
+            wsc3display = new WebSocket(connectionString);
+            wsc3display.OnMessage += Ws_OnMessage3Display;
+            while (!wsc3display.IsAlive)
+            {
+                try
+                {
+                    wsc3display.Connect();
+                    wsc3display.Send("Hello from client");
+                }
+                catch { }
+                System.Threading.Thread.Sleep(1);
+            }
+        }
+        private void Ws_OnMessage3Display(object sender, MessageEventArgs e)
+        {
+            Data3Display = e.RawData;
+            if (Data3Display.Length > 0)
+                texture3 = byteArrayToTexture(Data3Display);
+        }
+        public void Disconnect3Display()
+        {
+            wsc3display.Close();
+        }
+        public void Connect4Display()
+        {
+            String connectionString = "ws://" + ip + ":" + (Convert.ToInt32(displayport) + 3).ToString() + "/4Display";
+            wsc4display = new WebSocket(connectionString);
+            wsc4display.OnMessage += Ws_OnMessage4Display;
+            while (!wsc4display.IsAlive)
+            {
+                try
+                {
+                    wsc4display.Connect();
+                    wsc4display.Send("Hello from client");
+                }
+                catch { }
+                System.Threading.Thread.Sleep(1);
+            }
+        }
+        private void Ws_OnMessage4Display(object sender, MessageEventArgs e)
+        {
+            Data4Display = e.RawData;
+            if (Data4Display.Length > 0)
+                texture4 = byteArrayToTexture(Data4Display);
+        }
+        public void Disconnect4Display()
+        {
+            wsc4display.Close();
+        }
         private Texture2D byteArrayToTexture(byte[] imageBytes)
         {
             if (imageBytes.Length > 0)
             {
                 using (var stream = new MemoryStream(imageBytes))
                 {
+                    /*System.Drawing.Bitmap bmp = new System.Drawing.Bitmap(stream);
+                    bmp.Save("test.png", ImageFormat.Png);*/
                     stream.Seek(0, SeekOrigin.Begin);
                     var tx = Texture2D.FromStream(GraphicsDevice, stream);
                     return tx;
