@@ -58,7 +58,7 @@
             this.textBox1.Name = "textBox1";
             this.textBox1.Size = new System.Drawing.Size(220, 22);
             this.textBox1.TabIndex = 1;
-            this.textBox1.Text = "192.168.1.19";
+            this.textBox1.Text = "192.168.1.12";
             this.textBox1.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
             // 
             // button1
