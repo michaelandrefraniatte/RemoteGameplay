@@ -1,0 +1,37 @@
+{
+  "Version": 1,
+  "WorkspaceRootPath": "C:\\Users\\micha\\Documents\\github\\RemoteGameplay\\Src\\V1\\RemoteGameplay\\",
+  "Documents": [
+    {
+      "AbsoluteMoniker": "D:0:0:{A65F7E91-E8D4-4629-A503-1D72A63630A5}|RemoteGameplay\\RemoteGameplay.csproj|c:\\users\\micha\\documents\\github\\remotegameplay\\src\\v1\\remotegameplay\\remotegameplay\\game1.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{A65F7E91-E8D4-4629-A503-1D72A63630A5}|RemoteGameplay\\RemoteGameplay.csproj|solutionrelative:remotegameplay\\game1.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    }
+  ],
+  "DocumentGroupContainers": [
+    {
+      "Orientation": 0,
+      "VerticalTabListWidth": 256,
+      "DocumentGroups": [
+        {
+          "DockedWidth": 200,
+          "SelectedChildIndex": 0,
+          "Children": [
+            {
+              "$type": "Document",
+              "DocumentIndex": 0,
+              "Title": "Game1.cs",
+              "DocumentMoniker": "C:\\Users\\micha\\Documents\\github\\RemoteGameplay\\Src\\V1\\RemoteGameplay\\RemoteGameplay\\Game1.cs",
+              "RelativeDocumentMoniker": "RemoteGameplay\\Game1.cs",
+              "ToolTip": "C:\\Users\\micha\\Documents\\github\\RemoteGameplay\\Src\\V1\\RemoteGameplay\\RemoteGameplay\\Game1.cs",
+              "RelativeToolTip": "RemoteGameplay\\Game1.cs",
+              "ViewState": "AQIAAJ0AAAAAAAAAAAAcwLEAAAABAAAA",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2024-04-28T00:58:28.646Z",
+              "EditorCaption": ""
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
