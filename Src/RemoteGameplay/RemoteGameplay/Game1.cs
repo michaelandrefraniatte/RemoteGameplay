@@ -7,6 +7,7 @@ using NAudio.CoreAudioApi;
 using NAudio.Wave;
 using System;
 using System.Windows.Forms;
+using SharpDX.Direct3D9;
 
 namespace RemoteGameplay
 {
@@ -15,13 +16,13 @@ namespace RemoteGameplay
         private GraphicsDeviceManager _graphics;
         private Microsoft.Xna.Framework.Graphics.SpriteBatch _spriteBatch;
         private string ip, displayport, audioport;
-        private WebSocket wscaudio, wscdisplay;
+        private WebSocket wscaudio, wsc1display, wsc2display;
         private BufferedWaveProvider src;
         private WasapiOut soundOut;
         private int width = Screen.PrimaryScreen.Bounds.Width;
         private int height = Screen.PrimaryScreen.Bounds.Height;
-        private Texture2D texture = null, texturetemp = null;
-        private byte[] DataDisplay = null, DataAudio = null;
+        private Texture2D texture1 = null, texture1temp = null, texture2 = null, texture2temp = null;
+        private byte[] Data1Display = null, Data2Display = null, DataAudio = null;
         public Game1()
         {
             _graphics = new GraphicsDeviceManager(this);
@@ -41,12 +42,14 @@ namespace RemoteGameplay
                 file.ReadLine();
                 audioport = file.ReadLine();
             }
-            ConnectDisplay();
+            Connect1Display();
+            Connect2Display();
             ConnectAudio();
         }
         public void ClosingForm(object sender, System.ComponentModel.CancelEventArgs e)
         {
-            DisconnectDisplay();
+            Disconnect1Display();
+            Disconnect2Display();
             DisconnectAudio();
         }
         protected override void Initialize()
@@ -67,10 +70,12 @@ namespace RemoteGameplay
         {
             try
             {
-                texturetemp = texture;
+                texture1temp = texture1;
+                texture2temp = texture2;
                 GraphicsDevice.Clear(Color.White);
                 _spriteBatch.Begin();
-                _spriteBatch.Draw(texturetemp, new Vector2(0, 0), new Rectangle(0, 0, width, height), Color.White);
+                _spriteBatch.Draw(texture1temp, new Vector2(0, 0), new Rectangle(0, 0, width, height / 2), Color.White);
+                _spriteBatch.Draw(texture2temp, new Vector2(0, height / 2), new Rectangle(0, 0, width, height / 2), Color.White);
                 _spriteBatch.End();
                 base.Draw(gameTime);
                 System.Threading.Thread.Sleep(30);
@@ -94,7 +99,7 @@ namespace RemoteGameplay
             }
             var enumerator = new MMDeviceEnumerator();
             MMDevice wasapi = null;
-            foreach (var mmdevice in enumerator.EnumerateAudioEndPoints(DataFlow.Render, DeviceState.Active))
+            foreach (var mmdevice in enumerator.EnumerateAudioEndPoints(DataFlow.Render, NAudio.CoreAudioApi.DeviceState.Active))
             {
                 wasapi = mmdevice;
                 break;
@@ -115,31 +120,57 @@ namespace RemoteGameplay
             wscaudio.Close();
             soundOut.Stop();
         }
-        public void ConnectDisplay()
+        public void Connect1Display()
         {
-            String connectionString = "ws://" + ip + ":" + displayport + "/Display";
-            wscdisplay = new WebSocket(connectionString);
-            wscdisplay.OnMessage += Ws_OnMessageDisplay;
-            while (!wscdisplay.IsAlive)
+            String connectionString = "ws://" + ip + ":" + displayport + "/1Display";
+            wsc1display = new WebSocket(connectionString);
+            wsc1display.OnMessage += Ws_OnMessage1Display;
+            while (!wsc1display.IsAlive)
             {
                 try
                 {
-                    wscdisplay.Connect();
-                    wscdisplay.Send("Hello from client");
+                    wsc1display.Connect();
+                    wsc1display.Send("Hello from client");
                 }
                 catch { }
                 System.Threading.Thread.Sleep(1);
             }
         }
-        private void Ws_OnMessageDisplay(object sender, MessageEventArgs e)
+        private void Ws_OnMessage1Display(object sender, MessageEventArgs e)
         {
-            DataDisplay = e.RawData;
-            if (DataDisplay.Length > 0)
-                texture = byteArrayToTexture(DataDisplay);
+            Data1Display = e.RawData;
+            if (Data1Display.Length > 0)
+                texture1 = byteArrayToTexture(Data1Display);
         }
-        public void DisconnectDisplay()
+        public void Disconnect1Display()
         {
-            wscdisplay.Close();
+            wsc1display.Close();
+        }
+        public void Connect2Display()
+        {
+            String connectionString = "ws://" + ip + ":" + (Convert.ToInt32(displayport) + 1).ToString() + "/2Display";
+            wsc2display = new WebSocket(connectionString);
+            wsc2display.OnMessage += Ws_OnMessage2Display;
+            while (!wsc2display.IsAlive)
+            {
+                try
+                {
+                    wsc2display.Connect();
+                    wsc2display.Send("Hello from client");
+                }
+                catch { }
+                System.Threading.Thread.Sleep(1);
+            }
+        }
+        private void Ws_OnMessage2Display(object sender, MessageEventArgs e)
+        {
+            Data2Display = e.RawData;
+            if (Data2Display.Length > 0)
+                texture2 = byteArrayToTexture(Data2Display);
+        }
+        public void Disconnect2Display()
+        {
+            wsc2display.Close();
         }
         private Texture2D byteArrayToTexture(byte[] imageBytes)
         {
