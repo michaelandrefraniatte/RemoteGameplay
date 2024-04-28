@@ -20,7 +20,7 @@ namespace RemoteGameplay
         private WasapiOut soundOut;
         private int width = Screen.PrimaryScreen.Bounds.Width;
         private int height = Screen.PrimaryScreen.Bounds.Height;
-        private Texture2D texture = null;
+        private Texture2D texture = null, texturetemp = null;
         private byte[] DataDisplay = null, DataAudio = null;
         public Game1()
         {
@@ -67,13 +67,13 @@ namespace RemoteGameplay
         {
             try
             {
-                if (DataDisplay.Length > 0)
-                    texture = byteArrayToTexture(DataDisplay);
+                texturetemp = texture;
                 GraphicsDevice.Clear(Color.White);
                 _spriteBatch.Begin();
-                _spriteBatch.Draw(texture, new Vector2(0, 0), new Microsoft.Xna.Framework.Rectangle(0, 0, width, height), Color.White);
+                _spriteBatch.Draw(texturetemp, new Vector2(0, 0), new Rectangle(0, 0, width, height), Color.White);
                 _spriteBatch.End();
                 base.Draw(gameTime);
+                System.Threading.Thread.Sleep(30);
             }
             catch { }
         }
@@ -99,7 +99,7 @@ namespace RemoteGameplay
                 wasapi = mmdevice;
                 break;
             }
-            soundOut = new WasapiOut(wasapi, AudioClientShareMode.Exclusive, false, 0);
+            soundOut = new WasapiOut(wasapi, AudioClientShareMode.Exclusive, false, 1);
             src = new BufferedWaveProvider(soundOut.OutputWaveFormat);
             soundOut.Init(src);
             soundOut.Play();
@@ -134,6 +134,8 @@ namespace RemoteGameplay
         private void Ws_OnMessageDisplay(object sender, MessageEventArgs e)
         {
             DataDisplay = e.RawData;
+            if (DataDisplay.Length > 0)
+                texture = byteArrayToTexture(DataDisplay);
         }
         public void DisconnectDisplay()
         {
@@ -141,25 +143,18 @@ namespace RemoteGameplay
         }
         private Texture2D byteArrayToTexture(byte[] imageBytes)
         {
-            try
+            if (imageBytes.Length > 0)
             {
-                if (imageBytes.Length > 0)
+                using (var stream = new MemoryStream(imageBytes))
                 {
-                    using (var stream = new MemoryStream(imageBytes))
-                    {
-                        stream.Seek(0, SeekOrigin.Begin);
-                        var tx = Texture2D.FromStream(GraphicsDevice, stream);
-                        return tx;
-                    }
-                }
-                else
-                {
-                    return null;
+                    stream.Seek(0, SeekOrigin.Begin);
+                    var tx = Texture2D.FromStream(GraphicsDevice, stream);
+                    return tx;
                 }
             }
-            catch 
-            {  
-                return null; 
+            else
+            {
+                return null;
             }
         }
     }

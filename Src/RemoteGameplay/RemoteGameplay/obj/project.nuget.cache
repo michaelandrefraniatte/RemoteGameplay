@@ -1,8 +1,8 @@
 {
   "version": 2,
-  "dgSpecHash": "A/rSW4mJqfEmzzU4GeaeSjqM2wk5u6V9asGoZtXx6c5roL2yX5vHtx7vSaleVOu9qmHRgHTkSo/1UZKj3G3oAQ==",
+  "dgSpecHash": "NwmEwY/f7xnzZ5Fd4wCWPMdGu1coa/0Fz54Or2lQ0SYkitjTwGHqR/qiYe+K24i/z0kZk1y8ecdulS6QewEqmQ==",
   "success": true,
-  "projectFilePath": "C:\\Users\\micha\\Documents\\github\\RemoteGameplay\\Src\\V1\\RemoteGameplay\\RemoteGameplay\\RemoteGameplay.csproj",
+  "projectFilePath": "C:\\Users\\micha\\Documents\\github\\RemoteGameplay\\Src\\RemoteGameplay\\RemoteGameplay\\RemoteGameplay.csproj",
   "expectedPackageFiles": [
     "C:\\Users\\micha\\.nuget\\packages\\libuv\\1.9.1\\libuv.1.9.1.nupkg.sha512",
     "C:\\Users\\micha\\.nuget\\packages\\microsoft.codeanalysis.analyzers\\1.1.0\\microsoft.codeanalysis.analyzers.1.1.0.nupkg.sha512",
