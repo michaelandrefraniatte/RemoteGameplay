@@ -162,6 +162,10 @@ namespace RemoteGameplayHost
                 Array.Resize(ref array, lastIndex + 1);
                 return array;
             }
+            public static void InitData()
+            {
+                rawdataavailable = null;
+            }
         }
         public class Audio : WebSocketBehavior
         {
@@ -175,11 +179,11 @@ namespace RemoteGameplayHost
                         try
                         {
                             Send(LSPAudio.rawdataavailable);
-                            LSPAudio.rawdataavailable = null;
+                            LSPAudio.InitData();
                         }
                         catch { }
                     }
-                    System.Threading.Thread.Sleep(1);
+                    System.Threading.Thread.Sleep(10);
                 }
             }
         }
@@ -277,6 +281,10 @@ namespace RemoteGameplayHost
                 Array.Resize(ref array, lastIndex + 1);
                 return array;
             }
+            public static void InitData()
+            {
+                rawdataavailable = null;
+            }
         }
         public class Display1 : WebSocketBehavior
         {
@@ -290,11 +298,11 @@ namespace RemoteGameplayHost
                         try
                         {
                             Send(LSP1Display.rawdataavailable);
-                            LSP1Display.rawdataavailable = null;
+                            LSP1Display.InitData();
                         }
                         catch { }
                     }
-                    System.Threading.Thread.Sleep(1);
+                    System.Threading.Thread.Sleep(30);
                 }
             }
         }
@@ -392,6 +400,10 @@ namespace RemoteGameplayHost
                 Array.Resize(ref array, lastIndex + 1);
                 return array;
             }
+            public static void InitData()
+            {
+                rawdataavailable = null;
+            }
         }
         public class Display2 : WebSocketBehavior
         {
@@ -405,11 +417,11 @@ namespace RemoteGameplayHost
                         try
                         {
                             Send(LSP2Display.rawdataavailable);
-                            LSP2Display.rawdataavailable = null;
+                            LSP2Display.InitData();
                         }
                         catch { }
                     }
-                    System.Threading.Thread.Sleep(1);
+                    System.Threading.Thread.Sleep(30);
                 }
             }
         }
@@ -507,6 +519,10 @@ namespace RemoteGameplayHost
                 Array.Resize(ref array, lastIndex + 1);
                 return array;
             }
+            public static void InitData()
+            {
+                rawdataavailable = null;
+            }
         }
         public class Display3 : WebSocketBehavior
         {
@@ -520,11 +536,11 @@ namespace RemoteGameplayHost
                         try
                         {
                             Send(LSP3Display.rawdataavailable);
-                            LSP3Display.rawdataavailable = null;
+                            LSP3Display.InitData();
                         }
                         catch { }
                     }
-                    System.Threading.Thread.Sleep(1);
+                    System.Threading.Thread.Sleep(30);
                 }
             }
         }
@@ -622,6 +638,10 @@ namespace RemoteGameplayHost
                 Array.Resize(ref array, lastIndex + 1);
                 return array;
             }
+            public static void InitData()
+            {
+                rawdataavailable = null;
+            }
         }
         public class Display4 : WebSocketBehavior
         {
@@ -635,11 +655,11 @@ namespace RemoteGameplayHost
                         try
                         {
                             Send(LSP4Display.rawdataavailable);
-                            LSP4Display.rawdataavailable = null;
+                            LSP4Display.InitData();
                         }
                         catch { }
                     }
-                    System.Threading.Thread.Sleep(1);
+                    System.Threading.Thread.Sleep(30);
                 }
             }
         }
