@@ -112,8 +112,10 @@ namespace RemoteGameplay
                 wasapi = mmdevice;
                 break;
             }
-            soundOut = new WasapiOut(wasapi, AudioClientShareMode.Exclusive, false, 1);
+            soundOut = new WasapiOut(wasapi, AudioClientShareMode.Exclusive, false, 2);
             src = new BufferedWaveProvider(soundOut.OutputWaveFormat);
+            src.DiscardOnBufferOverflow = true;
+            src.BufferDuration = TimeSpan.FromMilliseconds(80);
             soundOut.Init(src);
             soundOut.Play();
         }
