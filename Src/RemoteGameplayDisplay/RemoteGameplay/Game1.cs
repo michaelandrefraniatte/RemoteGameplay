@@ -37,14 +37,9 @@ namespace RemoteGameplay
                 _graphics.PreferredBackBufferWidth = width;
                 _graphics.PreferredBackBufferHeight = height;
                 _graphics.IsFullScreen = true;
-                Form _GameForm = (Form)Form.FromHandle(Window.Handle);
-                _GameForm.Closing += ClosingForm;
+                Exiting += Shutdown;
                 Connect1Display();
             }
-        }
-        public void ClosingForm(object sender, System.ComponentModel.CancelEventArgs e)
-        {
-            Disconnect1Display();
         }
         protected override void Initialize()
         {
@@ -58,10 +53,13 @@ namespace RemoteGameplay
         {
             if (Keyboard.GetState().IsKeyDown(Microsoft.Xna.Framework.Input.Keys.LeftAlt) & Keyboard.GetState().IsKeyDown(Microsoft.Xna.Framework.Input.Keys.F4))
             {
-                Disconnect1Display();
-                Exit();
+                Disconnect1Display(); 
             }
             base.Update(gameTime);
+        }
+        public void Shutdown(object sender, EventArgs e)
+        {
+            Disconnect1Display();
         }
         protected override void Draw(GameTime gameTime)
         {
@@ -100,6 +98,8 @@ namespace RemoteGameplay
         {
             closed = true;
             wsc1display.Close();
+            Exit();
+            Environment.Exit(0);
         }
         private Texture2D byteArrayToTexture(byte[] imageBytes)
         {

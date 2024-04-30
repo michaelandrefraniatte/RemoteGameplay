@@ -129,7 +129,7 @@ namespace RemoteGameplayHost
             public static string localip;
             public static string port;
             public static WebSocketServer wss;
-            public static byte[] rawdataavailable;
+            public static byte[] rawdataavailable, rawdata;
             private static WasapiLoopbackCapture waveIn = null;
             public static void Connect()
             {
@@ -159,12 +159,9 @@ namespace RemoteGameplayHost
             }
             private static void waveIn_DataAvailable(object sender, WaveInEventArgs e)
             {
-                if (e.BytesRecorded > 0)
-                {
-                    byte[] rawdata = new byte[e.BytesRecorded];
-                    Array.Copy(e.Buffer, 0, rawdata, 0, e.BytesRecorded);
-                    rawdataavailable = rawdata;
-                }
+                rawdata = new byte[e.BytesRecorded];
+                Array.Copy(e.Buffer, 0, rawdata, 0, e.BytesRecorded);
+                rawdataavailable = rawdata;
             }
             public static void InitData()
             {
@@ -187,7 +184,7 @@ namespace RemoteGameplayHost
                         }
                         catch { }
                     }
-                    System.Threading.Thread.Sleep(10);
+                    System.Threading.Thread.Sleep(1);
                 }
             }
         }
