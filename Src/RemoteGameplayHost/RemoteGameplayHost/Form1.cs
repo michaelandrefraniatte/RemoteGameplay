@@ -31,8 +31,7 @@ namespace RemoteGameplayHost
         public static uint CurrentResolution = 0;
         public static bool running = false, closed = false;
         public static string displayport, audioport, localip;
-        public static int width = 0, height = 0;
-        private static Bitmap screen, screen1, screen2, screen3, screen4;
+        private static Bitmap screen, screen1;
         public static Bitmap img;
         public static Graphics graphics;
         private void Form1_KeyDown(object sender, KeyEventArgs e)
@@ -63,8 +62,6 @@ namespace RemoteGameplayHost
                     textBox1.Text = file.ReadLine();
                     textBox2.Text = file.ReadLine();
                     textBox3.Text = file.ReadLine();
-                    textBox4.Text = file.ReadLine();
-                    textBox5.Text = file.ReadLine();
                 }
             }
         }
@@ -104,8 +101,6 @@ namespace RemoteGameplayHost
                 createdfile.WriteLine(textBox1.Text);
                 createdfile.WriteLine(textBox2.Text);
                 createdfile.WriteLine(textBox3.Text);
-                createdfile.WriteLine(textBox4.Text);
-                createdfile.WriteLine(textBox5.Text);
             }
         }
         private void button1_Click(object sender, EventArgs e)
@@ -117,12 +112,7 @@ namespace RemoteGameplayHost
                 localip = textBox1.Text;
                 displayport = textBox2.Text;
                 audioport = textBox3.Text;
-                width = Convert.ToInt32(textBox4.Text);
-                height = Convert.ToInt32(textBox5.Text);
                 Task.Run(() => LSP1Display.Connect());
-                Task.Run(() => LSP2Display.Connect());
-                Task.Run(() => LSP3Display.Connect());
-                Task.Run(() => LSP4Display.Connect());
                 Task.Run(() => LSPAudio.Connect());
             }
             else
@@ -131,9 +121,6 @@ namespace RemoteGameplayHost
                 running = false;
                 System.Threading.Thread.Sleep(100);
                 Task.Run(() => LSP1Display.Disconnect());
-                Task.Run(() => LSP2Display.Disconnect());
-                Task.Run(() => LSP3Display.Disconnect());
-                Task.Run(() => LSP4Display.Disconnect());
                 Task.Run(() => LSPAudio.Disconnect());
             }
         }
@@ -176,14 +163,8 @@ namespace RemoteGameplayHost
                 {
                     byte[] rawdata = new byte[e.BytesRecorded];
                     Array.Copy(e.Buffer, 0, rawdata, 0, e.BytesRecorded);
-                    rawdataavailable = TrimEndAudio(rawdata);
+                    rawdataavailable = rawdata;
                 }
-            }
-            public static byte[] TrimEndAudio(byte[] array)
-            {
-                int lastIndex = Array.FindLastIndex(array, b => b != 0);
-                Array.Resize(ref array, lastIndex + 1);
-                return array;
             }
             public static void InitData()
             {
@@ -221,14 +202,10 @@ namespace RemoteGameplayHost
             public static Encoder myEncoder;
             public static EncoderParameter myEncoderParameter;
             public static EncoderParameters myEncoderParameters;
-            public static Bitmap output;
-            public static Graphics g;
             public static void Connect()
             {
                 try
                 {
-                    width = Form1.width;
-                    height = Form1.height;
                     myImageCodecInfo = GetEncoderInfo("image/jpeg");
                     myEncoder = Encoder.Quality;
                     myEncoderParameters = new EncoderParameters(1);
@@ -260,8 +237,6 @@ namespace RemoteGameplayHost
             {
                 wss.RemoveWebSocketService("/1Display");
                 wss.Stop();
-                output.Dispose();
-                g.Dispose();
             }
             public static void taskSend()
             {
@@ -269,11 +244,8 @@ namespace RemoteGameplayHost
                 {
                     try
                     {
-                        screen1 = screen.Clone(new System.Drawing.Rectangle(0, 0, Screen.PrimaryScreen.Bounds.Width, Screen.PrimaryScreen.Bounds.Height / 4), screen.PixelFormat);
-                        output = new Bitmap(width, height / 4);
-                        g = Graphics.FromImage(output);
-                        g.DrawImage(screen1, 0, 0, width, height / 4);
-                        rawdataavailable = BitmapToByteArray(output);
+                        screen1 = screen;
+                        rawdataavailable = BitmapToByteArray(screen1);
                     }
                     catch { }
                     System.Threading.Thread.Sleep(30);
@@ -284,14 +256,8 @@ namespace RemoteGameplayHost
                 using(var stream = new MemoryStream())
                 {
                     img.Save(stream, myImageCodecInfo, myEncoderParameters);
-                    return TrimEndDisplay(stream.ToArray());
+                    return stream.ToArray();
                 }
-            }
-            public static byte[] TrimEndDisplay(byte[] array)
-            {
-                int lastIndex = Array.FindLastIndex(array, b => b != 0);
-                Array.Resize(ref array, lastIndex + 1);
-                return array;
             }
             public static void InitData()
             {
@@ -311,330 +277,6 @@ namespace RemoteGameplayHost
                         {
                             Send(LSP1Display.rawdataavailable);
                             LSP1Display.InitData();
-                        }
-                        catch { }
-                    }
-                    System.Threading.Thread.Sleep(30);
-                }
-            }
-        }
-        public class LSP2Display
-        {
-            public static string localip;
-            public static string port;
-            public static WebSocketServer wss;
-            public static byte[] rawdataavailable;
-            public static int width = 0, height = 0;
-            public static ImageCodecInfo myImageCodecInfo;
-            public static Encoder myEncoder;
-            public static EncoderParameter myEncoderParameter;
-            public static EncoderParameters myEncoderParameters;
-            public static Bitmap output;
-            public static Graphics g;
-            public static void Connect()
-            {
-                try
-                {
-                    width = Form1.width;
-                    height = Form1.height;
-                    myImageCodecInfo = GetEncoderInfo("image/jpeg");
-                    myEncoder = Encoder.Quality;
-                    myEncoderParameters = new EncoderParameters(1);
-                    myEncoderParameter = new EncoderParameter(myEncoder, 25L);
-                    myEncoderParameters.Param[0] = myEncoderParameter;
-                    localip = Form1.localip;
-                    port = Form1.displayport;
-                    String connectionString = "ws://" + localip + ":" + (Convert.ToInt32(port) + 1).ToString();
-                    wss = new WebSocketServer(connectionString);
-                    wss.AddWebSocketService<Display2>("/2Display");
-                    wss.Start();
-                }
-                catch { }
-                Task.Run(() => taskSend());
-            }
-            private static ImageCodecInfo GetEncoderInfo(String mimeType)
-            {
-                int j;
-                ImageCodecInfo[] encoders;
-                encoders = ImageCodecInfo.GetImageEncoders();
-                for (j = 0; j < encoders.Length; ++j)
-                {
-                    if (encoders[j].MimeType == mimeType)
-                        return encoders[j];
-                }
-                return null;
-            }
-            public static void Disconnect()
-            {
-                wss.RemoveWebSocketService("/2Display");
-                wss.Stop();
-                output.Dispose();
-                g.Dispose();
-            }
-            public static void taskSend()
-            {
-                while (Form1.running)
-                {
-                    try
-                    {
-                        screen2 = screen.Clone(new System.Drawing.Rectangle(0, Screen.PrimaryScreen.Bounds.Height * 1 / 4, Screen.PrimaryScreen.Bounds.Width, Screen.PrimaryScreen.Bounds.Height / 4), screen.PixelFormat);
-                        output = new Bitmap(width, height / 4);
-                        g = Graphics.FromImage(output);
-                        g.DrawImage(screen2, 0, 0, width, height / 4);
-                        rawdataavailable = BitmapToByteArray(output);
-                    }
-                    catch { }
-                    System.Threading.Thread.Sleep(30);
-                }
-            }
-            public static byte[] BitmapToByteArray(Bitmap img)
-            {
-                using (var stream = new MemoryStream())
-                {
-                    img.Save(stream, myImageCodecInfo, myEncoderParameters);
-                    return TrimEndDisplay(stream.ToArray());
-                }
-            }
-            public static byte[] TrimEndDisplay(byte[] array)
-            {
-                int lastIndex = Array.FindLastIndex(array, b => b != 0);
-                Array.Resize(ref array, lastIndex + 1);
-                return array;
-            }
-            public static void InitData()
-            {
-                rawdataavailable = null;
-            }
-        }
-        public class Display2 : WebSocketBehavior
-        {
-            protected override void OnMessage(MessageEventArgs e)
-            {
-                base.OnMessage(e);
-                while (Form1.running)
-                {
-                    if (LSP2Display.rawdataavailable != null)
-                    {
-                        try
-                        {
-                            Send(LSP2Display.rawdataavailable);
-                            LSP2Display.InitData();
-                        }
-                        catch { }
-                    }
-                    System.Threading.Thread.Sleep(30);
-                }
-            }
-        }
-        public class LSP3Display
-        {
-            public static string localip;
-            public static string port;
-            public static WebSocketServer wss;
-            public static byte[] rawdataavailable;
-            public static int width = 0, height = 0;
-            public static ImageCodecInfo myImageCodecInfo;
-            public static Encoder myEncoder;
-            public static EncoderParameter myEncoderParameter;
-            public static EncoderParameters myEncoderParameters;
-            public static Bitmap output;
-            public static Graphics g;
-            public static void Connect()
-            {
-                try
-                {
-                    width = Form1.width;
-                    height = Form1.height;
-                    myImageCodecInfo = GetEncoderInfo("image/jpeg");
-                    myEncoder = Encoder.Quality;
-                    myEncoderParameters = new EncoderParameters(1);
-                    myEncoderParameter = new EncoderParameter(myEncoder, 25L);
-                    myEncoderParameters.Param[0] = myEncoderParameter;
-                    localip = Form1.localip;
-                    port = Form1.displayport;
-                    String connectionString = "ws://" + localip + ":" + (Convert.ToInt32(port) + 2).ToString();
-                    wss = new WebSocketServer(connectionString);
-                    wss.AddWebSocketService<Display3>("/3Display");
-                    wss.Start();
-                }
-                catch { }
-                Task.Run(() => taskSend());
-            }
-            private static ImageCodecInfo GetEncoderInfo(String mimeType)
-            {
-                int j;
-                ImageCodecInfo[] encoders;
-                encoders = ImageCodecInfo.GetImageEncoders();
-                for (j = 0; j < encoders.Length; ++j)
-                {
-                    if (encoders[j].MimeType == mimeType)
-                        return encoders[j];
-                }
-                return null;
-            }
-            public static void Disconnect()
-            {
-                wss.RemoveWebSocketService("/3Display");
-                wss.Stop();
-                output.Dispose();
-                g.Dispose();
-            }
-            public static void taskSend()
-            {
-                while (Form1.running)
-                {
-                    try
-                    {
-                        screen3 = screen.Clone(new System.Drawing.Rectangle(0, Screen.PrimaryScreen.Bounds.Height * 2 / 4, Screen.PrimaryScreen.Bounds.Width, Screen.PrimaryScreen.Bounds.Height / 4), screen.PixelFormat);
-                        output = new Bitmap(width, height / 4);
-                        g = Graphics.FromImage(output);
-                        g.DrawImage(screen3, 0, 0, width, height / 4);
-                        rawdataavailable = BitmapToByteArray(output);
-                    }
-                    catch { }
-                    System.Threading.Thread.Sleep(30);
-                }
-            }
-            public static byte[] BitmapToByteArray(Bitmap img)
-            {
-                using (var stream = new MemoryStream())
-                {
-                    img.Save(stream, myImageCodecInfo, myEncoderParameters);
-                    return TrimEndDisplay(stream.ToArray());
-                }
-            }
-            public static byte[] TrimEndDisplay(byte[] array)
-            {
-                int lastIndex = Array.FindLastIndex(array, b => b != 0);
-                Array.Resize(ref array, lastIndex + 1);
-                return array;
-            }
-            public static void InitData()
-            {
-                rawdataavailable = null;
-            }
-        }
-        public class Display3 : WebSocketBehavior
-        {
-            protected override void OnMessage(MessageEventArgs e)
-            {
-                base.OnMessage(e);
-                while (Form1.running)
-                {
-                    if (LSP3Display.rawdataavailable != null)
-                    {
-                        try
-                        {
-                            Send(LSP3Display.rawdataavailable);
-                            LSP3Display.InitData();
-                        }
-                        catch { }
-                    }
-                    System.Threading.Thread.Sleep(30);
-                }
-            }
-        }
-        public class LSP4Display
-        {
-            public static string localip;
-            public static string port;
-            public static WebSocketServer wss;
-            public static byte[] rawdataavailable;
-            public static int width = 0, height = 0;
-            public static ImageCodecInfo myImageCodecInfo;
-            public static Encoder myEncoder;
-            public static EncoderParameter myEncoderParameter;
-            public static EncoderParameters myEncoderParameters;
-            public static Bitmap output;
-            public static Graphics g;
-            public static void Connect()
-            {
-                try
-                {
-                    width = Form1.width;
-                    height = Form1.height;
-                    myImageCodecInfo = GetEncoderInfo("image/jpeg");
-                    myEncoder = Encoder.Quality;
-                    myEncoderParameters = new EncoderParameters(1);
-                    myEncoderParameter = new EncoderParameter(myEncoder, 25L);
-                    myEncoderParameters.Param[0] = myEncoderParameter;
-                    localip = Form1.localip;
-                    port = Form1.displayport;
-                    String connectionString = "ws://" + localip + ":" + (Convert.ToInt32(port) + 3).ToString();
-                    wss = new WebSocketServer(connectionString);
-                    wss.AddWebSocketService<Display4>("/4Display");
-                    wss.Start();
-                }
-                catch { }
-                Task.Run(() => taskSend());
-            }
-            private static ImageCodecInfo GetEncoderInfo(String mimeType)
-            {
-                int j;
-                ImageCodecInfo[] encoders;
-                encoders = ImageCodecInfo.GetImageEncoders();
-                for (j = 0; j < encoders.Length; ++j)
-                {
-                    if (encoders[j].MimeType == mimeType)
-                        return encoders[j];
-                }
-                return null;
-            }
-            public static void Disconnect()
-            {
-                wss.RemoveWebSocketService("/4Display");
-                wss.Stop();
-                output.Dispose();
-                g.Dispose();
-            }
-            public static void taskSend()
-            {
-                while (Form1.running)
-                {
-                    try
-                    {
-                        screen4 = screen.Clone(new System.Drawing.Rectangle(0, Screen.PrimaryScreen.Bounds.Height * 3 / 4, Screen.PrimaryScreen.Bounds.Width, Screen.PrimaryScreen.Bounds.Height / 4), screen.PixelFormat);
-                        output = new Bitmap(width, height / 4);
-                        g = Graphics.FromImage(output);
-                        g.DrawImage(screen4, 0, 0, width, height / 4);
-                        rawdataavailable = BitmapToByteArray(output);
-                    }
-                    catch { }
-                    System.Threading.Thread.Sleep(30);
-                }
-            }
-            public static byte[] BitmapToByteArray(Bitmap img)
-            {
-                using (var stream = new MemoryStream())
-                {
-                    img.Save(stream, myImageCodecInfo, myEncoderParameters);
-                    return TrimEndDisplay(stream.ToArray());
-                }
-            }
-            public static byte[] TrimEndDisplay(byte[] array)
-            {
-                int lastIndex = Array.FindLastIndex(array, b => b != 0);
-                Array.Resize(ref array, lastIndex + 1);
-                return array;
-            }
-            public static void InitData()
-            {
-                rawdataavailable = null;
-            }
-        }
-        public class Display4 : WebSocketBehavior
-        {
-            protected override void OnMessage(MessageEventArgs e)
-            {
-                base.OnMessage(e);
-                while (Form1.running)
-                {
-                    if (LSP4Display.rawdataavailable != null)
-                    {
-                        try
-                        {
-                            Send(LSP4Display.rawdataavailable);
-                            LSP4Display.InitData();
                         }
                         catch { }
                     }

@@ -234,13 +234,6 @@ C:\Users\micha\Documents\github\RemoteGameplay\Src\RemoteGameplayDisplay\RemoteG
 C:\Users\micha\Documents\github\RemoteGameplay\Src\RemoteGameplayDisplay\RemoteGameplay\bin\Release\net6.0-windows\Microsoft.CodeAnalysis.CSharp.dll
 C:\Users\micha\Documents\github\RemoteGameplay\Src\RemoteGameplayDisplay\RemoteGameplay\bin\Release\net6.0-windows\Microsoft.CodeAnalysis.VisualBasic.dll
 C:\Users\micha\Documents\github\RemoteGameplay\Src\RemoteGameplayDisplay\RemoteGameplay\bin\Release\net6.0-windows\MonoGame.Framework.dll
-C:\Users\micha\Documents\github\RemoteGameplay\Src\RemoteGameplayDisplay\RemoteGameplay\bin\Release\net6.0-windows\NAudio.dll
-C:\Users\micha\Documents\github\RemoteGameplay\Src\RemoteGameplayDisplay\RemoteGameplay\bin\Release\net6.0-windows\NAudio.Asio.dll
-C:\Users\micha\Documents\github\RemoteGameplay\Src\RemoteGameplayDisplay\RemoteGameplay\bin\Release\net6.0-windows\NAudio.Core.dll
-C:\Users\micha\Documents\github\RemoteGameplay\Src\RemoteGameplayDisplay\RemoteGameplay\bin\Release\net6.0-windows\NAudio.Midi.dll
-C:\Users\micha\Documents\github\RemoteGameplay\Src\RemoteGameplayDisplay\RemoteGameplay\bin\Release\net6.0-windows\NAudio.Wasapi.dll
-C:\Users\micha\Documents\github\RemoteGameplay\Src\RemoteGameplayDisplay\RemoteGameplay\bin\Release\net6.0-windows\NAudio.WinForms.dll
-C:\Users\micha\Documents\github\RemoteGameplay\Src\RemoteGameplayDisplay\RemoteGameplay\bin\Release\net6.0-windows\NAudio.WinMM.dll
 C:\Users\micha\Documents\github\RemoteGameplay\Src\RemoteGameplayDisplay\RemoteGameplay\bin\Release\net6.0-windows\SharpDX.dll
 C:\Users\micha\Documents\github\RemoteGameplay\Src\RemoteGameplayDisplay\RemoteGameplay\bin\Release\net6.0-windows\SharpDX.Direct2D1.dll
 C:\Users\micha\Documents\github\RemoteGameplay\Src\RemoteGameplayDisplay\RemoteGameplay\bin\Release\net6.0-windows\SharpDX.Direct3D11.dll

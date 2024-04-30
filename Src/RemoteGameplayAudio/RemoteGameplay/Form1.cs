@@ -13,19 +13,17 @@ namespace RemoteGameplay
         {
             InitializeComponent();
         }
-        private string ip, displayport, audioport;
+        private string ip, audioport;
         private WebSocket wscaudio;
         private BufferedWaveProvider src;
         private WasapiOut soundOut;
-        private byte[] DataAudio = null;
+        private bool closed = false;
         private void Form1_Load(object sender, EventArgs e)
         {
             using (StreamReader file = new StreamReader("params.txt"))
             {
                 file.ReadLine();
                 ip = file.ReadLine();
-                file.ReadLine();
-                displayport = file.ReadLine();
                 file.ReadLine();
                 audioport = file.ReadLine();
             }
@@ -43,7 +41,7 @@ namespace RemoteGameplay
             String connectionString = "ws://" + ip + ":" + audioport + "/Audio";
             wscaudio = new WebSocket(connectionString);
             wscaudio.OnMessage += Ws_OnMessageAudio;
-            while (!wscaudio.IsAlive)
+            while (!wscaudio.IsAlive & !closed)
             {
                 try
                 {
@@ -69,12 +67,11 @@ namespace RemoteGameplay
         }
         private void Ws_OnMessageAudio(object sender, MessageEventArgs e)
         {
-            DataAudio = e.RawData;
-            if (DataAudio.Length > 0)
-                src.AddSamples(DataAudio, 0, DataAudio.Length);
+            src.AddSamples(e.RawData, 0, e.RawData.Length);
         }
         public void DisconnectAudio()
         {
+            closed = true;
             wscaudio.Close();
             soundOut.Stop();
         }
