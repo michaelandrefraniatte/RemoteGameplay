@@ -3,7 +3,7 @@
   "WorkspaceRootPath": "C:\\Users\\micha\\Documents\\github\\RemoteGameplay\\Src\\RemoteGameplayHost\\",
   "Documents": [
     {
-      "AbsoluteMoniker": "D:0:0:{CBC3CF18-D12C-4555-BBE3-9D640EA1BA6A}|RemoteGameplayHost\\RemoteGameplayHost.csproj|c:\\users\\micha\\documents\\github\\remotegameplay\\src\\remotegameplayhost\\remotegameplayhost\\form1.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "AbsoluteMoniker": "D:0:0:{CBC3CF18-D12C-4555-BBE3-9D640EA1BA6A}|RemoteGameplayHost\\RemoteGameplayHost.csproj|C:\\Users\\micha\\Documents\\github\\RemoteGameplay\\Src\\RemoteGameplayHost\\remotegameplayhost\\form1.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
       "RelativeMoniker": "D:0:0:{CBC3CF18-D12C-4555-BBE3-9D640EA1BA6A}|RemoteGameplayHost\\RemoteGameplayHost.csproj|solutionrelative:remotegameplayhost\\form1.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
@@ -28,7 +28,7 @@
               "RelativeDocumentMoniker": "RemoteGameplayHost\\Form1.cs",
               "ToolTip": "C:\\Users\\micha\\Documents\\github\\RemoteGameplay\\Src\\RemoteGameplayHost\\RemoteGameplayHost\\Form1.cs",
               "RelativeToolTip": "RemoteGameplayHost\\Form1.cs",
-              "ViewState": "AQIAAI8CAAAAAAAAAAAowJoCAAABAAAA",
+              "ViewState": "AQIAABYAAAAAAAAAAAAQwCQAAAAxAAAA",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
               "WhenOpened": "2024-04-22T15:01:30.531Z",
               "EditorCaption": ""

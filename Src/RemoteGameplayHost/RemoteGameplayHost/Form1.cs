@@ -9,7 +9,7 @@ using WebSocketSharp;
 using System.IO;
 using System.Drawing.Drawing2D;
 using System.Drawing.Imaging;
-using System.Linq;
+using DesktopDuplication;
 
 namespace RemoteGameplayHost
 {
@@ -30,9 +30,12 @@ namespace RemoteGameplayHost
         [DllImport("ntdll.dll", EntryPoint = "NtSetTimerResolution")]
         public static extern void NtSetTimerResolution(uint DesiredResolution, bool SetResolution, ref uint CurrentResolution);
         public static uint CurrentResolution = 0;
-        public static bool running = false;
+        public static bool running = false, closed = false;
         public static string displayport, audioport, localip;
         public static int width = 0, height = 0;
+        private static DesktopDuplicator desktopDuplicator;
+        private static DesktopFrame frame = null;
+        private static Bitmap screen;
         private void Form1_KeyDown(object sender, KeyEventArgs e)
         {
             OnKeyDown(e.KeyData);
@@ -68,9 +71,35 @@ namespace RemoteGameplayHost
         }
         private void RemoteGameplayHost_Shown(object sender, EventArgs e)
         {
+            try
+            {
+                desktopDuplicator = new DesktopDuplicator(0);
+                Task.Run(() => CopyScreen());
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.ToString());
+            }
         }
         private void RemoteGameplayHost_FormClosed(object sender, FormClosedEventArgs e)
         {
+            closed = true;
+        }
+        private void CopyScreen()
+        {
+            while (!closed)
+            {
+                try
+                {
+                    frame = desktopDuplicator.GetLatestFrame();
+                    screen = frame.DesktopImage;
+                }
+                catch
+                {
+                    desktopDuplicator = new DesktopDuplicator(0);
+                }
+                System.Threading.Thread.Sleep(30);
+            }
         }
         private void RemoteGameplayHost_FormClosing(object sender, FormClosingEventArgs e)
         {
