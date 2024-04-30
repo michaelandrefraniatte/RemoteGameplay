@@ -37,11 +37,3 @@ C:\Users\micha\Documents\github\RemoteGameplay\Src\RemoteGameplayHost\RemoteGame
 C:\Users\micha\Documents\github\RemoteGameplay\Src\RemoteGameplayHost\RemoteGameplayHost\obj\Release\RemoteGa.76E0CB92.Up2Date
 C:\Users\micha\Documents\github\RemoteGameplay\Src\RemoteGameplayHost\RemoteGameplayHost\obj\Release\RemoteGameplayHost.exe
 C:\Users\micha\Documents\github\RemoteGameplay\Src\RemoteGameplayHost\RemoteGameplayHost\obj\Release\RemoteGameplayHost.pdb
-C:\Users\micha\Documents\github\RemoteGameplay\Src\RemoteGameplayHost\RemoteGameplayHost\bin\Release\DesktopDuplication.dll
-C:\Users\micha\Documents\github\RemoteGameplay\Src\RemoteGameplayHost\RemoteGameplayHost\bin\Release\SharpDX.Direct3D11.dll
-C:\Users\micha\Documents\github\RemoteGameplay\Src\RemoteGameplayHost\RemoteGameplayHost\bin\Release\SharpDX.DXGI.dll
-C:\Users\micha\Documents\github\RemoteGameplay\Src\RemoteGameplayHost\RemoteGameplayHost\bin\Release\SharpDX.dll
-C:\Users\micha\Documents\github\RemoteGameplay\Src\RemoteGameplayHost\RemoteGameplayHost\bin\Release\DesktopDuplication.pdb
-C:\Users\micha\Documents\github\RemoteGameplay\Src\RemoteGameplayHost\RemoteGameplayHost\bin\Release\SharpDX.Direct3D11.xml
-C:\Users\micha\Documents\github\RemoteGameplay\Src\RemoteGameplayHost\RemoteGameplayHost\bin\Release\SharpDX.DXGI.xml
-C:\Users\micha\Documents\github\RemoteGameplay\Src\RemoteGameplayHost\RemoteGameplayHost\bin\Release\SharpDX.xml

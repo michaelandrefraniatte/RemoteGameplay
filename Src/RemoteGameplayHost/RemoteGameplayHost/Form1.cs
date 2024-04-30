@@ -9,7 +9,6 @@ using WebSocketSharp;
 using System.IO;
 using System.Drawing.Drawing2D;
 using System.Drawing.Imaging;
-using DesktopDuplication;
 
 namespace RemoteGameplayHost
 {
@@ -33,9 +32,9 @@ namespace RemoteGameplayHost
         public static bool running = false, closed = false;
         public static string displayport, audioport, localip;
         public static int width = 0, height = 0;
-        private static DesktopDuplicator desktopDuplicator;
-        private static DesktopFrame frame = null;
-        private static Bitmap screen;
+        private static Bitmap screen, screen1, screen2, screen3, screen4;
+        public static Bitmap img;
+        public static Graphics graphics;
         private void Form1_KeyDown(object sender, KeyEventArgs e)
         {
             OnKeyDown(e.KeyData);
@@ -71,34 +70,29 @@ namespace RemoteGameplayHost
         }
         private void RemoteGameplayHost_Shown(object sender, EventArgs e)
         {
-            try
-            {
-                desktopDuplicator = new DesktopDuplicator(0);
-                Task.Run(() => CopyScreen());
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show(ex.ToString());
-            }
+            Task.Run(() => CopyScreen());
         }
         private void RemoteGameplayHost_FormClosed(object sender, FormClosedEventArgs e)
         {
             closed = true;
+            System.Threading.Thread.Sleep(100);
+            img.Dispose();
+            graphics.Dispose();
         }
         private void CopyScreen()
         {
             while (!closed)
             {
-                try
-                {
-                    frame = desktopDuplicator.GetLatestFrame();
-                    screen = frame.DesktopImage;
-                }
-                catch
-                {
-                    desktopDuplicator = new DesktopDuplicator(0);
-                }
-                System.Threading.Thread.Sleep(30);
+                img = new Bitmap(Screen.PrimaryScreen.Bounds.Width, Screen.PrimaryScreen.Bounds.Height);
+                graphics = Graphics.FromImage(img);
+                graphics.PixelOffsetMode = PixelOffsetMode.HighSpeed;
+                graphics.SmoothingMode = SmoothingMode.HighSpeed;
+                graphics.InterpolationMode = InterpolationMode.Low;
+                graphics.CompositingMode = CompositingMode.SourceCopy;
+                graphics.CompositingQuality = CompositingQuality.HighSpeed;
+                graphics.CopyFromScreen(0, 0, 0, 0, img.Size);
+                screen = img;
+                System.Threading.Thread.Sleep(1);
             }
         }
         private void RemoteGameplayHost_FormClosing(object sender, FormClosingEventArgs e)
@@ -227,8 +221,6 @@ namespace RemoteGameplayHost
             public static Encoder myEncoder;
             public static EncoderParameter myEncoderParameter;
             public static EncoderParameters myEncoderParameters;
-            public static Bitmap img;
-            public static Graphics graphics;
             public static Bitmap output;
             public static Graphics g;
             public static void Connect()
@@ -268,8 +260,6 @@ namespace RemoteGameplayHost
             {
                 wss.RemoveWebSocketService("/1Display");
                 wss.Stop();
-                img.Dispose();
-                graphics.Dispose();
                 output.Dispose();
                 g.Dispose();
             }
@@ -279,17 +269,10 @@ namespace RemoteGameplayHost
                 {
                     try
                     {
-                        img = new Bitmap(Screen.PrimaryScreen.Bounds.Width, Screen.PrimaryScreen.Bounds.Height / 4);
-                        graphics = Graphics.FromImage(img);
-                        graphics.PixelOffsetMode = PixelOffsetMode.HighSpeed;
-                        graphics.SmoothingMode = SmoothingMode.HighSpeed;
-                        graphics.InterpolationMode = InterpolationMode.Low;
-                        graphics.CompositingMode = CompositingMode.SourceCopy;
-                        graphics.CompositingQuality = CompositingQuality.HighSpeed;
-                        graphics.CopyFromScreen(0, 0, 0, 0, img.Size);
+                        screen1 = screen.Clone(new System.Drawing.Rectangle(0, 0, Screen.PrimaryScreen.Bounds.Width, Screen.PrimaryScreen.Bounds.Height / 4), screen.PixelFormat);
                         output = new Bitmap(width, height / 4);
                         g = Graphics.FromImage(output);
-                        g.DrawImage(img, 0, 0, width, height / 4);
+                        g.DrawImage(screen1, 0, 0, width, height / 4);
                         rawdataavailable = BitmapToByteArray(output);
                     }
                     catch { }
@@ -346,8 +329,6 @@ namespace RemoteGameplayHost
             public static Encoder myEncoder;
             public static EncoderParameter myEncoderParameter;
             public static EncoderParameters myEncoderParameters;
-            public static Bitmap img;
-            public static Graphics graphics;
             public static Bitmap output;
             public static Graphics g;
             public static void Connect()
@@ -387,8 +368,6 @@ namespace RemoteGameplayHost
             {
                 wss.RemoveWebSocketService("/2Display");
                 wss.Stop();
-                img.Dispose();
-                graphics.Dispose();
                 output.Dispose();
                 g.Dispose();
             }
@@ -398,17 +377,10 @@ namespace RemoteGameplayHost
                 {
                     try
                     {
-                        img = new Bitmap(Screen.PrimaryScreen.Bounds.Width, Screen.PrimaryScreen.Bounds.Height / 4);
-                        graphics = Graphics.FromImage(img);
-                        graphics.PixelOffsetMode = PixelOffsetMode.HighSpeed;
-                        graphics.SmoothingMode = SmoothingMode.HighSpeed;
-                        graphics.InterpolationMode = InterpolationMode.Low;
-                        graphics.CompositingMode = CompositingMode.SourceCopy;
-                        graphics.CompositingQuality = CompositingQuality.HighSpeed;
-                        graphics.CopyFromScreen(0, Screen.PrimaryScreen.Bounds.Height * 1 / 4, 0, 0, img.Size);
+                        screen2 = screen.Clone(new System.Drawing.Rectangle(0, Screen.PrimaryScreen.Bounds.Height * 1 / 4, Screen.PrimaryScreen.Bounds.Width, Screen.PrimaryScreen.Bounds.Height / 4), screen.PixelFormat);
                         output = new Bitmap(width, height / 4);
                         g = Graphics.FromImage(output);
-                        g.DrawImage(img, 0, 0, width, height / 4);
+                        g.DrawImage(screen2, 0, 0, width, height / 4);
                         rawdataavailable = BitmapToByteArray(output);
                     }
                     catch { }
@@ -465,8 +437,6 @@ namespace RemoteGameplayHost
             public static Encoder myEncoder;
             public static EncoderParameter myEncoderParameter;
             public static EncoderParameters myEncoderParameters;
-            public static Bitmap img;
-            public static Graphics graphics;
             public static Bitmap output;
             public static Graphics g;
             public static void Connect()
@@ -506,8 +476,6 @@ namespace RemoteGameplayHost
             {
                 wss.RemoveWebSocketService("/3Display");
                 wss.Stop();
-                img.Dispose();
-                graphics.Dispose();
                 output.Dispose();
                 g.Dispose();
             }
@@ -517,17 +485,10 @@ namespace RemoteGameplayHost
                 {
                     try
                     {
-                        img = new Bitmap(Screen.PrimaryScreen.Bounds.Width, Screen.PrimaryScreen.Bounds.Height / 4);
-                        graphics = Graphics.FromImage(img);
-                        graphics.PixelOffsetMode = PixelOffsetMode.HighSpeed;
-                        graphics.SmoothingMode = SmoothingMode.HighSpeed;
-                        graphics.InterpolationMode = InterpolationMode.Low;
-                        graphics.CompositingMode = CompositingMode.SourceCopy;
-                        graphics.CompositingQuality = CompositingQuality.HighSpeed;
-                        graphics.CopyFromScreen(0, Screen.PrimaryScreen.Bounds.Height * 2 / 4, 0, 0, img.Size);
+                        screen3 = screen.Clone(new System.Drawing.Rectangle(0, Screen.PrimaryScreen.Bounds.Height * 2 / 4, Screen.PrimaryScreen.Bounds.Width, Screen.PrimaryScreen.Bounds.Height / 4), screen.PixelFormat);
                         output = new Bitmap(width, height / 4);
                         g = Graphics.FromImage(output);
-                        g.DrawImage(img, 0, 0, width, height / 4);
+                        g.DrawImage(screen3, 0, 0, width, height / 4);
                         rawdataavailable = BitmapToByteArray(output);
                     }
                     catch { }
@@ -584,8 +545,6 @@ namespace RemoteGameplayHost
             public static Encoder myEncoder;
             public static EncoderParameter myEncoderParameter;
             public static EncoderParameters myEncoderParameters;
-            public static Bitmap img;
-            public static Graphics graphics;
             public static Bitmap output;
             public static Graphics g;
             public static void Connect()
@@ -625,8 +584,6 @@ namespace RemoteGameplayHost
             {
                 wss.RemoveWebSocketService("/4Display");
                 wss.Stop();
-                img.Dispose();
-                graphics.Dispose();
                 output.Dispose();
                 g.Dispose();
             }
@@ -636,17 +593,10 @@ namespace RemoteGameplayHost
                 {
                     try
                     {
-                        img = new Bitmap(Screen.PrimaryScreen.Bounds.Width, Screen.PrimaryScreen.Bounds.Height / 4);
-                        graphics = Graphics.FromImage(img);
-                        graphics.PixelOffsetMode = PixelOffsetMode.HighSpeed;
-                        graphics.SmoothingMode = SmoothingMode.HighSpeed;
-                        graphics.InterpolationMode = InterpolationMode.Low;
-                        graphics.CompositingMode = CompositingMode.SourceCopy;
-                        graphics.CompositingQuality = CompositingQuality.HighSpeed;
-                        graphics.CopyFromScreen(0, Screen.PrimaryScreen.Bounds.Height * 3 / 4, 0, 0, img.Size);
+                        screen4 = screen.Clone(new System.Drawing.Rectangle(0, Screen.PrimaryScreen.Bounds.Height * 3 / 4, Screen.PrimaryScreen.Bounds.Width, Screen.PrimaryScreen.Bounds.Height / 4), screen.PixelFormat);
                         output = new Bitmap(width, height / 4);
                         g = Graphics.FromImage(output);
-                        g.DrawImage(img, 0, 0, width, height / 4);
+                        g.DrawImage(screen4, 0, 0, width, height / 4);
                         rawdataavailable = BitmapToByteArray(output);
                     }
                     catch { }
