@@ -14,7 +14,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("RemoteGameplay")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Release")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+d448af8974eb6e5e871183f7e11dcb39fadcebf5")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+a85e3b3842ac92c37b675247b4d4085ce8bca658")]
 [assembly: System.Reflection.AssemblyProductAttribute("RemoteGameplay")]
 [assembly: System.Reflection.AssemblyTitleAttribute("RemoteGameplay")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

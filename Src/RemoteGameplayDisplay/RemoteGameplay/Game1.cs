@@ -4,15 +4,31 @@ using Microsoft.Xna.Framework.Input;
 using WebSocketSharp;
 using System.IO;
 using System;
+using System.Runtime.InteropServices;
 using System.Windows.Forms;
-using SharpDX.Direct3D9;
 
 namespace RemoteGameplay
 {
     public class Game1 : Game
     {
+        static void OnKeyDown(System.Windows.Forms.Keys keyData)
+        {
+            if (keyData == System.Windows.Forms.Keys.F1)
+            {
+                const string message = "• Author: Michaël André Franiatte.\n\r\n\r• Contact: michael.franiatte@gmail.com.\n\r\n\r• Publisher: https://github.com/michaelandrefraniatte.\n\r\n\r• Copyrights: All rights reserved, no permissions granted.\n\r\n\r• License: Not open source, not free of charge to use.";
+                const string caption = "About";
+                System.Windows.Forms.MessageBox.Show(message, caption, MessageBoxButtons.OK, MessageBoxIcon.Information);
+            }
+        }
+        [DllImport("winmm.dll", EntryPoint = "timeBeginPeriod")]
+        public static extern uint TimeBeginPeriod(uint ms);
+        [DllImport("winmm.dll", EntryPoint = "timeEndPeriod")]
+        public static extern uint TimeEndPeriod(uint ms);
+        [DllImport("ntdll.dll", EntryPoint = "NtSetTimerResolution")]
+        public static extern void NtSetTimerResolution(uint DesiredResolution, bool SetResolution, ref uint CurrentResolution);
+        public static uint CurrentResolution = 0;
         private GraphicsDeviceManager _graphics;
-        private Microsoft.Xna.Framework.Graphics.SpriteBatch _spriteBatch;
+        private SpriteBatch _spriteBatch;
         private string ip, displayport;
         private WebSocket wsc1display;
         private int width;
@@ -21,6 +37,8 @@ namespace RemoteGameplay
         private bool closed = false;
         public Game1()
         {
+            TimeBeginPeriod(1);
+            NtSetTimerResolution(1, true, ref CurrentResolution);
             using (StreamReader file = new StreamReader("params.txt"))
             {
                 file.ReadLine();
