@@ -22,10 +22,6 @@ namespace RemoteGameplayHost
         public static extern uint TimeBeginPeriod(uint ms);
         [DllImport("winmm.dll", EntryPoint = "timeEndPeriod")]
         public static extern uint TimeEndPeriod(uint ms);
-        [DllImport("User32.dll")]
-        public static extern bool GetCursorPos(out int x, out int y);
-        [DllImport("user32.dll")]
-        public static extern void SetCursorPos(int X, int Y);
         [DllImport("ntdll.dll", EntryPoint = "NtSetTimerResolution")]
         public static extern void NtSetTimerResolution(uint DesiredResolution, bool SetResolution, ref uint CurrentResolution);
         public static uint CurrentResolution = 0;
