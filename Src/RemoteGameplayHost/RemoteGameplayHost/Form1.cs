@@ -9,6 +9,7 @@ using WebSocketSharp;
 using System.IO;
 using System.Drawing.Drawing2D;
 using System.Drawing.Imaging;
+using DesktopDuplication;
 
 namespace RemoteGameplayHost
 {
@@ -28,8 +29,8 @@ namespace RemoteGameplayHost
         public static bool running = false, closed = false;
         public static string displayport, audioport, localip;
         private static Bitmap screen, screen1;
-        public static Bitmap img;
-        public static Graphics graphics;
+        private DesktopDuplicator desktopDuplicator;
+        private DesktopFrame frame = null;
         private void Form1_KeyDown(object sender, KeyEventArgs e)
         {
             OnKeyDown(e.KeyData);
@@ -51,9 +52,9 @@ namespace RemoteGameplayHost
         {
             TimeBeginPeriod(1);
             NtSetTimerResolution(1, true, ref CurrentResolution);
-            if (System.IO.File.Exists("tempsave"))
+            if (File.Exists("tempsave"))
             {
-                using (System.IO.StreamReader file = new System.IO.StreamReader("tempsave"))
+                using (StreamReader file = new StreamReader("tempsave"))
                 {
                     textBox1.Text = file.ReadLine();
                     textBox2.Text = file.ReadLine();
@@ -63,28 +64,40 @@ namespace RemoteGameplayHost
         }
         private void RemoteGameplayHost_Shown(object sender, EventArgs e)
         {
+            try
+            {
+                desktopDuplicator = new DesktopDuplicator(0);
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.ToString());
+            }
             Task.Run(() => CopyScreen());
         }
         private void RemoteGameplayHost_FormClosed(object sender, FormClosedEventArgs e)
         {
             closed = true;
-            System.Threading.Thread.Sleep(100);
-            img.Dispose();
-            graphics.Dispose();
         }
         private void CopyScreen()
         {
             while (!closed)
             {
-                img = new Bitmap(Screen.PrimaryScreen.Bounds.Width, Screen.PrimaryScreen.Bounds.Height);
-                graphics = Graphics.FromImage(img);
-                graphics.PixelOffsetMode = PixelOffsetMode.HighSpeed;
-                graphics.SmoothingMode = SmoothingMode.HighSpeed;
-                graphics.InterpolationMode = InterpolationMode.Low;
-                graphics.CompositingMode = CompositingMode.SourceCopy;
-                graphics.CompositingQuality = CompositingQuality.HighSpeed;
-                graphics.CopyFromScreen(0, 0, 0, 0, img.Size);
-                screen = img;
+                Application.DoEvents();
+                frame = null;
+                try
+                {
+                    frame = desktopDuplicator.GetLatestFrame();
+                }
+                catch
+                {
+                    desktopDuplicator = new DesktopDuplicator(0);
+                    System.Threading.Thread.Sleep(1);
+                    continue;
+                }
+                if (frame != null)
+                {
+                    screen = frame.DesktopImage;
+                }
                 System.Threading.Thread.Sleep(1);
             }
         }
@@ -92,7 +105,7 @@ namespace RemoteGameplayHost
         {
             running = false;
             System.Threading.Thread.Sleep(300);
-            using (System.IO.StreamWriter createdfile = new System.IO.StreamWriter("tempsave"))
+            using (StreamWriter createdfile = new StreamWriter("tempsave"))
             {
                 createdfile.WriteLine(textBox1.Text);
                 createdfile.WriteLine(textBox2.Text);
