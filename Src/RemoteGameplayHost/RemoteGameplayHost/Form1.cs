@@ -7,7 +7,6 @@ using System.Windows.Forms;
 using WebSocketSharp.Server;
 using WebSocketSharp;
 using System.IO;
-using System.Drawing.Drawing2D;
 using System.Drawing.Imaging;
 using DesktopDuplication;
 
@@ -20,13 +19,13 @@ namespace RemoteGameplayHost
             InitializeComponent();
         }
         [DllImport("winmm.dll", EntryPoint = "timeBeginPeriod")]
-        public static extern uint TimeBeginPeriod(uint ms);
+        private static extern uint TimeBeginPeriod(uint ms);
         [DllImport("winmm.dll", EntryPoint = "timeEndPeriod")]
-        public static extern uint TimeEndPeriod(uint ms);
+        private static extern uint TimeEndPeriod(uint ms);
         [DllImport("ntdll.dll", EntryPoint = "NtSetTimerResolution")]
-        public static extern void NtSetTimerResolution(uint DesiredResolution, bool SetResolution, ref uint CurrentResolution);
-        public static uint CurrentResolution = 0;
-        public static bool running = false, closed = false;
+        private static extern void NtSetTimerResolution(uint DesiredResolution, bool SetResolution, ref uint CurrentResolution);
+        private static uint CurrentResolution = 0;
+        private static bool running = false, closed = false;
         public static string displayport, audioport, localip;
         private static Bitmap screen, screen1;
         private DesktopDuplicator desktopDuplicator;
@@ -135,10 +134,11 @@ namespace RemoteGameplayHost
         }
         public class LSPAudio
         {
-            public static string localip;
-            public static string port;
-            public static WebSocketServer wss;
-            public static byte[] rawdataavailable, rawdata;
+            private static string localip;
+            private static string port;
+            private static WebSocketServer wss;
+            public static byte[] rawdataavailable;
+            private static byte[] rawdata;
             private static WasapiLoopbackCapture waveIn = null;
             public static void Connect()
             {
@@ -160,7 +160,7 @@ namespace RemoteGameplayHost
                 wss.Stop();
                 waveIn.Dispose();
             }
-            public static void GetAudioByteArray()
+            private static void GetAudioByteArray()
             {
                 waveIn = new WasapiLoopbackCapture();
                 waveIn.DataAvailable += waveIn_DataAvailable;
@@ -171,10 +171,6 @@ namespace RemoteGameplayHost
                 rawdata = new byte[e.BytesRecorded];
                 Array.Copy(e.Buffer, 0, rawdata, 0, e.BytesRecorded);
                 rawdataavailable = rawdata;
-            }
-            public static void InitData()
-            {
-                rawdataavailable = null;
             }
         }
         public class Audio : WebSocketBehavior
@@ -189,7 +185,7 @@ namespace RemoteGameplayHost
                         try
                         {
                             Send(LSPAudio.rawdataavailable);
-                            LSPAudio.InitData();
+                            LSPAudio.rawdataavailable = null;
                         }
                         catch { }
                     }
@@ -199,15 +195,14 @@ namespace RemoteGameplayHost
         }
         public class LSP1Display
         {
-            public static string localip;
-            public static string port;
-            public static WebSocketServer wss;
+            private static string localip;
+            private static string port;
+            private static WebSocketServer wss;
             public static byte[] rawdataavailable;
-            public static int width = 0, height = 0;
-            public static ImageCodecInfo myImageCodecInfo;
-            public static Encoder myEncoder;
-            public static EncoderParameter myEncoderParameter;
-            public static EncoderParameters myEncoderParameters;
+            private static ImageCodecInfo myImageCodecInfo;
+            private static Encoder myEncoder;
+            private static EncoderParameter myEncoderParameter;
+            private static EncoderParameters myEncoderParameters;
             public static void Connect()
             {
                 try
@@ -244,7 +239,7 @@ namespace RemoteGameplayHost
                 wss.RemoveWebSocketService("/1Display");
                 wss.Stop();
             }
-            public static void taskSend()
+            private static void taskSend()
             {
                 while (Form1.running)
                 {
@@ -257,17 +252,13 @@ namespace RemoteGameplayHost
                     System.Threading.Thread.Sleep(30);
                 }
             }
-            public static byte[] BitmapToByteArray(Bitmap img)
+            private static byte[] BitmapToByteArray(Bitmap img)
             {
                 using(var stream = new MemoryStream())
                 {
                     img.Save(stream, myImageCodecInfo, myEncoderParameters);
                     return stream.ToArray();
                 }
-            }
-            public static void InitData()
-            {
-                rawdataavailable = null;
             }
         }
         public class Display1 : WebSocketBehavior
@@ -282,7 +273,7 @@ namespace RemoteGameplayHost
                         try
                         {
                             Send(LSP1Display.rawdataavailable);
-                            LSP1Display.InitData();
+                            LSP1Display.rawdataavailable = null;
                         }
                         catch { }
                     }
