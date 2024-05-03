@@ -1,14 +1,17 @@
 ﻿using NAudio.Wave;
 using System;
-using System.Drawing;
 using System.Runtime.InteropServices;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using WebSocketSharp.Server;
 using WebSocketSharp;
 using System.IO;
+using SharpDX.DXGI;
+using SharpDX;
+using SharpDX.Direct3D11;
 using System.Drawing.Imaging;
-using DesktopDuplication;
+using Device = SharpDX.Direct3D11.Device;
+using MapFlags = SharpDX.Direct3D11.MapFlags;
 
 namespace RemoteGameplayHost
 {
@@ -27,9 +30,37 @@ namespace RemoteGameplayHost
         private static uint CurrentResolution = 0;
         private static bool running = false, closed = false;
         public static string displayport, audioport, localip;
-        private static Bitmap screen, screen1;
-        private DesktopDuplicator desktopDuplicator;
-        private DesktopFrame frame = null;
+        private static int width = Screen.PrimaryScreen.Bounds.Width, height = Screen.PrimaryScreen.Bounds.Height;
+        private Device mDevice;
+        private Texture2DDescription mTextureDesc;
+        private OutputDescription mOutputDesc;
+        private OutputDuplication mDeskDupl;
+        private Texture2D desktopImageTexture = null;
+        private OutputDuplicateFrameInformation frameInfo = new OutputDuplicateFrameInformation();
+        private System.Drawing.Bitmap finalImage1, finalImage2;
+        private bool isFinalImage1 = false;
+        private static byte[] raw;
+        private System.Drawing.Bitmap FinalImage
+        {
+            get
+            {
+                return isFinalImage1 ? finalImage1 : finalImage2;
+            }
+            set
+            {
+                if (isFinalImage1)
+                {
+                    finalImage2 = value;
+                    if (finalImage1 != null) finalImage1.Dispose();
+                }
+                else
+                {
+                    finalImage1 = value;
+                    if (finalImage2 != null) finalImage2.Dispose();
+                }
+                isFinalImage1 = !isFinalImage1;
+            }
+        }
         private void Form1_KeyDown(object sender, KeyEventArgs e)
         {
             OnKeyDown(e.KeyData);
@@ -63,42 +94,12 @@ namespace RemoteGameplayHost
         }
         private void RemoteGameplayHost_Shown(object sender, EventArgs e)
         {
-            try
-            {
-                desktopDuplicator = new DesktopDuplicator(0);
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show(ex.ToString());
-            }
+            InitCaptureScreen();
             Task.Run(() => CopyScreen());
         }
         private void RemoteGameplayHost_FormClosed(object sender, FormClosedEventArgs e)
         {
             closed = true;
-        }
-        private void CopyScreen()
-        {
-            while (!closed)
-            {
-                Application.DoEvents();
-                frame = null;
-                try
-                {
-                    frame = desktopDuplicator.GetLatestFrame();
-                }
-                catch
-                {
-                    desktopDuplicator = new DesktopDuplicator(0);
-                    System.Threading.Thread.Sleep(1);
-                    continue;
-                }
-                if (frame != null)
-                {
-                    screen = frame.DesktopImage;
-                }
-                System.Threading.Thread.Sleep(1);
-            }
         }
         private void RemoteGameplayHost_FormClosing(object sender, FormClosingEventArgs e)
         {
@@ -131,6 +132,114 @@ namespace RemoteGameplayHost
                 Task.Run(() => LSP1Display.Disconnect());
                 Task.Run(() => LSPAudio.Disconnect());
             }
+        }
+        private void CopyScreen()
+        {
+            while (!closed)
+            {
+                CaptureScreen();
+                System.Threading.Thread.Sleep(1);
+            }
+        }
+        public void InitCaptureScreen()
+        {
+            Adapter1 adapter = null;
+            try
+            {
+                adapter = new SharpDX.DXGI.Factory1().GetAdapter1(0);
+            }
+            catch { }
+            this.mDevice = new Device(adapter);
+            Output output = null;
+            try
+            {
+                output = adapter.GetOutput(0);
+            }
+            catch { }
+            var output1 = output.QueryInterface<Output1>();
+            this.mOutputDesc = output.Description;
+            this.mTextureDesc = new Texture2DDescription()
+            {
+                CpuAccessFlags = CpuAccessFlags.Read,
+                BindFlags = BindFlags.None,
+                Format = SharpDX.DXGI.Format.B8G8R8A8_UNorm,
+                Width = width,
+                Height = height,
+                OptionFlags = ResourceOptionFlags.None,
+                MipLevels = 1,
+                ArraySize = 1,
+                SampleDescription = { Count = 1, Quality = 0 },
+                Usage = ResourceUsage.Staging
+            };
+            try
+            {
+                this.mDeskDupl = output1.DuplicateOutput(mDevice);
+            }
+            catch
+            {
+            }
+        }
+        public void CaptureScreen()
+        {
+            RetrieveFrame();
+            try
+            {
+                ProcessFrame();
+            }
+            catch
+            {
+                ReleaseFrame();
+            }
+            try
+            {
+                ReleaseFrame();
+            }
+            catch
+            {
+            }
+        }
+        private void RetrieveFrame()
+        {
+            if (desktopImageTexture == null)
+                desktopImageTexture = new Texture2D(mDevice, mTextureDesc);
+            SharpDX.DXGI.Resource desktopResource = null;
+            frameInfo = new OutputDuplicateFrameInformation();
+            try
+            {
+                mDeskDupl.AcquireNextFrame(500, out frameInfo, out desktopResource);
+            }
+            catch { }
+            using (var tempTexture = desktopResource.QueryInterface<Texture2D>())
+                mDevice.ImmediateContext.CopyResource(tempTexture, desktopImageTexture);
+            desktopResource.Dispose();
+        }
+        private void ProcessFrame()
+        {
+            MemoryStream file = new MemoryStream();
+            var mapSource = mDevice.ImmediateContext.MapSubresource(desktopImageTexture, 0, MapMode.Read, MapFlags.None);
+            FinalImage = new System.Drawing.Bitmap(width, height, System.Drawing.Imaging.PixelFormat.Format32bppRgb);
+            var boundsRect = new System.Drawing.Rectangle(0, 0, width, height);
+            var mapDest = FinalImage.LockBits(boundsRect, ImageLockMode.WriteOnly, FinalImage.PixelFormat);
+            var sourcePtr = mapSource.DataPointer;
+            var destPtr = mapDest.Scan0;
+            for (int y = 0; y < height; y++)
+            {
+                Utilities.CopyMemory(destPtr, sourcePtr, width * 4);
+                sourcePtr = IntPtr.Add(sourcePtr, mapSource.RowPitch);
+                destPtr = IntPtr.Add(destPtr, mapDest.Stride);
+            }
+            FinalImage.UnlockBits(mapDest);
+            mDevice.ImmediateContext.UnmapSubresource(desktopImageTexture, 0);
+            FinalImage.Save(file, System.Drawing.Imaging.ImageFormat.Jpeg);
+            raw = file.ToArray();
+        }
+        private void ReleaseFrame()
+        {
+            try
+            {
+                mDeskDupl.ReleaseFrame();
+            }
+            catch { }
         }
         public class LSPAudio
         {
@@ -245,19 +354,10 @@ namespace RemoteGameplayHost
                 {
                     try
                     {
-                        screen1 = screen;
-                        rawdataavailable = BitmapToByteArray(screen1);
+                        rawdataavailable = Form1.raw;
                     }
                     catch { }
                     System.Threading.Thread.Sleep(30);
-                }
-            }
-            private static byte[] BitmapToByteArray(Bitmap img)
-            {
-                using(var stream = new MemoryStream())
-                {
-                    img.Save(stream, myImageCodecInfo, myEncoderParameters);
-                    return stream.ToArray();
                 }
             }
         }
