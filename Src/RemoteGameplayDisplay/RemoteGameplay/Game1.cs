@@ -33,7 +33,7 @@ namespace RemoteGameplay
         private WebSocket wsc1display;
         private int width;
         private int height;
-        private Texture2D texture1 = null, texture1temp = null;
+        private Texture2D texture1 = null;
         private bool closed = false;
         public Game1()
         {
@@ -71,7 +71,7 @@ namespace RemoteGameplay
         {
             if (Keyboard.GetState().IsKeyDown(Microsoft.Xna.Framework.Input.Keys.LeftAlt) & Keyboard.GetState().IsKeyDown(Microsoft.Xna.Framework.Input.Keys.F4))
             {
-                Disconnect1Display(); 
+                Disconnect1Display();
             }
             base.Update(gameTime);
         }
@@ -83,10 +83,9 @@ namespace RemoteGameplay
         {
             try
             {
-                texture1temp = texture1; 
                 GraphicsDevice.Clear(Color.White);
                 _spriteBatch.Begin();
-                _spriteBatch.Draw(texture1temp, new Vector2(0, 0), new Rectangle(0, 0, width, height), Color.White);
+                _spriteBatch.Draw(texture1, new Vector2(0, 0), new Rectangle(0, 0, width, height), Color.White);
                 _spriteBatch.End();
                 base.Draw(gameTime);
             }

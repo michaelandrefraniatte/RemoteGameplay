@@ -39,7 +39,7 @@ namespace RemoteGameplayHost
         private OutputDuplicateFrameInformation frameInfo = new OutputDuplicateFrameInformation();
         private System.Drawing.Bitmap finalImage1, finalImage2;
         private bool isFinalImage1 = false;
-        private static byte[] raw;
+        public static byte[] rawdataavailable;
         private System.Drawing.Bitmap FinalImage
         {
             get
@@ -231,7 +231,7 @@ namespace RemoteGameplayHost
             FinalImage.UnlockBits(mapDest);
             mDevice.ImmediateContext.UnmapSubresource(desktopImageTexture, 0);
             FinalImage.Save(file, System.Drawing.Imaging.ImageFormat.Jpeg);
-            raw = file.ToArray();
+            rawdataavailable = file.ToArray();
         }
         private void ReleaseFrame()
         {
@@ -307,20 +307,10 @@ namespace RemoteGameplayHost
             private static string localip;
             private static string port;
             private static WebSocketServer wss;
-            public static byte[] rawdataavailable;
-            private static ImageCodecInfo myImageCodecInfo;
-            private static Encoder myEncoder;
-            private static EncoderParameter myEncoderParameter;
-            private static EncoderParameters myEncoderParameters;
             public static void Connect()
             {
                 try
                 {
-                    myImageCodecInfo = GetEncoderInfo("image/jpeg");
-                    myEncoder = Encoder.Quality;
-                    myEncoderParameters = new EncoderParameters(1);
-                    myEncoderParameter = new EncoderParameter(myEncoder, 25L);
-                    myEncoderParameters.Param[0] = myEncoderParameter;
                     localip = Form1.localip;
                     port = Form1.displayport;
                     String connectionString = "ws://" + localip + ":" + port;
@@ -329,36 +319,11 @@ namespace RemoteGameplayHost
                     wss.Start();
                 }
                 catch { }
-                Task.Run(() => taskSend());
-            }
-            private static ImageCodecInfo GetEncoderInfo(String mimeType)
-            {
-                int j;
-                ImageCodecInfo[] encoders;
-                encoders = ImageCodecInfo.GetImageEncoders();
-                for (j = 0; j < encoders.Length; ++j)
-                {
-                    if (encoders[j].MimeType == mimeType)
-                        return encoders[j];
-                }
-                return null;
             }
             public static void Disconnect()
             {
                 wss.RemoveWebSocketService("/1Display");
                 wss.Stop();
-            }
-            private static void taskSend()
-            {
-                while (Form1.running)
-                {
-                    try
-                    {
-                        rawdataavailable = Form1.raw;
-                    }
-                    catch { }
-                    System.Threading.Thread.Sleep(30);
-                }
             }
         }
         public class Display1 : WebSocketBehavior
@@ -368,16 +333,12 @@ namespace RemoteGameplayHost
                 base.OnMessage(e);
                 while (Form1.running)
                 {
-                    if (LSP1Display.rawdataavailable != null)
+                    try
                     {
-                        try
-                        {
-                            Send(LSP1Display.rawdataavailable);
-                            LSP1Display.rawdataavailable = null;
-                        }
-                        catch { }
+                        Send(Form1.rawdataavailable);
                     }
-                    System.Threading.Thread.Sleep(30);
+                    catch { }
+                    System.Threading.Thread.Sleep(50);
                 }
             }
         }
