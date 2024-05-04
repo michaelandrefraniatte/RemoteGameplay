@@ -56,6 +56,7 @@ namespace RemoteGameplay
                 _graphics.PreferredBackBufferHeight = height;
                 _graphics.IsFullScreen = true;
                 IsFixedTimeStep = false;
+                TargetElapsedTime = TimeSpan.FromSeconds(1d / 30d);
                 Exiting += Shutdown;
                 Connect1Display();
             }
@@ -86,6 +87,7 @@ namespace RemoteGameplay
             _spriteBatch.Begin();
             _spriteBatch.Draw(texture1, new Vector2(0, 0), new Rectangle(0, 0, width, height), Color.White);
             _spriteBatch.End();
+            GC.Collect();
             base.Draw(gameTime);
         }
         public void Connect1Display()
