@@ -51,10 +51,11 @@ namespace RemoteGameplay
                 height = Convert.ToInt32(file.ReadLine());
                 _graphics = new GraphicsDeviceManager(this);
                 Content.RootDirectory = "Content";
-                IsMouseVisible = false;
+                IsMouseVisible = true;
                 _graphics.PreferredBackBufferWidth = width;
                 _graphics.PreferredBackBufferHeight = height;
                 _graphics.IsFullScreen = true;
+                IsFixedTimeStep = false;
                 Exiting += Shutdown;
                 Connect1Display();
             }
@@ -81,15 +82,11 @@ namespace RemoteGameplay
         }
         protected override void Draw(GameTime gameTime)
         {
-            try
-            {
-                GraphicsDevice.Clear(Color.White);
-                _spriteBatch.Begin();
-                _spriteBatch.Draw(texture1, new Vector2(0, 0), new Rectangle(0, 0, width, height), Color.White);
-                _spriteBatch.End();
-                base.Draw(gameTime);
-            }
-            catch { }
+            GraphicsDevice.Clear(Color.CornflowerBlue);
+            _spriteBatch.Begin();
+            _spriteBatch.Draw(texture1, new Vector2(0, 0), new Rectangle(0, 0, width, height), Color.White);
+            _spriteBatch.End();
+            base.Draw(gameTime);
         }
         public void Connect1Display()
         {
