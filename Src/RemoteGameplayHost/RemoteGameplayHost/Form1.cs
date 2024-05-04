@@ -278,7 +278,7 @@ namespace RemoteGameplayHost
         }
         public class Audio : WebSocketBehavior
         {
-            private static byte[] rawdataavailable;
+            private static byte[] rawdataavailable = null, raw = null;
             protected override void OnMessage(MessageEventArgs e)
             {
                 base.OnMessage(e);
@@ -292,7 +292,9 @@ namespace RemoteGameplayHost
             }
             public void waveIn_DataAvailable(object sender, WaveInEventArgs e)
             {
-                rawdataavailable = e.Buffer;
+                raw = e.Buffer;
+                Array.Resize(ref raw, e.BytesRecorded);
+                rawdataavailable = raw;
             }
         }
         public class LSP1Display
