@@ -12,6 +12,7 @@ using SharpDX.Direct3D11;
 using System.Drawing.Imaging;
 using Device = SharpDX.Direct3D11.Device;
 using MapFlags = SharpDX.Direct3D11.MapFlags;
+using System.Threading;
 
 namespace RemoteGameplayHost
 {
@@ -245,9 +246,8 @@ namespace RemoteGameplayHost
         {
             private static string localip;
             private static string port;
+            private static Audio audio = new Audio();
             private static WebSocketServer wss;
-            public static byte[] rawdataavailable;
-            private static byte[] rawdata;
             private static WasapiLoopbackCapture waveIn = null;
             public static void Connect()
             {
@@ -263,43 +263,36 @@ namespace RemoteGameplayHost
                 }
                 catch { }
             }
+            private static void GetAudioByteArray()
+            {
+                waveIn = new WasapiLoopbackCapture();
+                waveIn.DataAvailable += audio.waveIn_DataAvailable;
+                waveIn.StartRecording();
+            }
             public static void Disconnect()
             {
                 wss.RemoveWebSocketService("/Audio");
                 wss.Stop();
                 waveIn.Dispose();
             }
-            private static void GetAudioByteArray()
-            {
-                waveIn = new WasapiLoopbackCapture();
-                waveIn.DataAvailable += waveIn_DataAvailable;
-                waveIn.StartRecording();
-            }
-            private static void waveIn_DataAvailable(object sender, WaveInEventArgs e)
-            {
-                rawdata = new byte[e.BytesRecorded];
-                Array.Copy(e.Buffer, 0, rawdata, 0, e.BytesRecorded);
-                rawdataavailable = rawdata;
-            }
         }
         public class Audio : WebSocketBehavior
         {
+            private static byte[] rawdataavailable;
             protected override void OnMessage(MessageEventArgs e)
             {
                 base.OnMessage(e);
                 while (Form1.running)
                 {
-                    if (LSPAudio.rawdataavailable != null)
-                    {
-                        try
-                        {
-                            Send(LSPAudio.rawdataavailable);
-                            LSPAudio.rawdataavailable = null;
-                        }
-                        catch { }
-                    }
-                    System.Threading.Thread.Sleep(1);
+                    if (rawdataavailable != null)
+                        Send(rawdataavailable);
+                    rawdataavailable = null;
+                    Thread.Sleep(1);
                 }
+            }
+            public void waveIn_DataAvailable(object sender, WaveInEventArgs e)
+            {
+                rawdataavailable = e.Buffer;
             }
         }
         public class LSP1Display
