@@ -27,7 +27,6 @@ namespace RemoteGameplay
         private BufferedWaveProvider src;
         private WasapiOut soundOut;
         private bool closed = false;
-        public int length;
         private void Form1_KeyDown(object sender, KeyEventArgs e)
         {
             OnKeyDown(e.KeyData);
@@ -91,19 +90,17 @@ namespace RemoteGameplay
                 wasapi = mmdevice;
                 break;
             }
-            soundOut = new WasapiOut(wasapi, AudioClientShareMode.Exclusive, false, 2);
-            src = new BufferedWaveProvider(soundOut.OutputWaveFormat);
+            WaveFormat waveformat = (new WasapiLoopbackCapture()).WaveFormat;
+            soundOut = new WasapiOut(wasapi, AudioClientShareMode.Shared, false, 2);
+            src = new BufferedWaveProvider(WaveFormat.CreateCustomFormat(waveformat.Encoding, waveformat.SampleRate, waveformat.Channels, waveformat.AverageBytesPerSecond, waveformat.BlockAlign, waveformat.BitsPerSample));
             src.DiscardOnBufferOverflow = true;
+            src.BufferLength = waveformat.AverageBytesPerSecond * 80 / 1000;
             soundOut.Init(src);
             soundOut.Play();
         }
         private void Ws_OnMessageAudio(object sender, MessageEventArgs e)
         {
-            Task.Run(() => {
-                length = e.RawData.Length;
-                src.BufferLength = length;
-                src.AddSamples(e.RawData, 0, length);
-            });
+            src.AddSamples(e.RawData, 0, e.RawData.Length);
         }
         public void DisconnectAudio()
         {
