@@ -4,3 +4,7 @@
 61000
 // Port for audio
 63000
+// Width
+1360
+// Height
+768

@@ -8,7 +8,6 @@ using System.Runtime.InteropServices;
 using System.Windows.Forms;
 using NAudio.CoreAudioApi;
 using NAudio.Wave;
-using SharpDX.Direct3D9;
 
 namespace RemoteGameplay
 {
@@ -34,7 +33,7 @@ namespace RemoteGameplay
         private SpriteBatch _spriteBatch;
         private string ip, displayport, audioport;
         private WebSocket wsc1display;
-        private static int width = Screen.PrimaryScreen.Bounds.Width, height = Screen.PrimaryScreen.Bounds.Height;
+        private static int width, height;
         private Texture2D texture1 = null, texturetemp = null;
         private WebSocket wscaudio;
         private BufferedWaveProvider src;
@@ -52,18 +51,22 @@ namespace RemoteGameplay
                 displayport = file.ReadLine();
                 file.ReadLine();
                 audioport = file.ReadLine();
-                _graphics = new GraphicsDeviceManager(this);
-                Content.RootDirectory = "Content";
-                IsMouseVisible = true;
-                _graphics.PreferredBackBufferWidth = width;
-                _graphics.PreferredBackBufferHeight = height;
-                _graphics.IsFullScreen = true;
-                IsFixedTimeStep = false;
-                TargetElapsedTime = TimeSpan.FromSeconds(1d / 30d);
-                Exiting += Shutdown;
-                Connect1Display();
-                ConnectAudio();
+                file.ReadLine();
+                width = Convert.ToInt32(file.ReadLine());
+                file.ReadLine();
+                height = Convert.ToInt32(file.ReadLine());
             }
+            _graphics = new GraphicsDeviceManager(this);
+            _graphics.PreferredBackBufferWidth = width;
+            _graphics.PreferredBackBufferHeight = height;
+            _graphics.ApplyChanges();
+            Content.RootDirectory = "Content";
+            IsMouseVisible = true;
+            IsFixedTimeStep = false;
+            TargetElapsedTime = TimeSpan.FromSeconds(1d / 30d);
+            Exiting += Shutdown;
+            Connect1Display();
+            ConnectAudio();
         }
         protected override void Initialize()
         {
