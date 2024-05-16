@@ -41,7 +41,7 @@ namespace RemoteGameplayHost
         private System.Drawing.Bitmap finalImage1, finalImage2;
         private bool isFinalImage1 = false;
         public static byte[] rawdataavailable;
-        public static Action<bool> action = null;
+        public static Action<bool> actionaudio = null, actiondisplay = null;
         private System.Drawing.Bitmap FinalImage
         {
             get
@@ -286,7 +286,7 @@ namespace RemoteGameplayHost
                 while (Form1.running)
                 {
                     if (rawdataavailable != null)
-                        SendAsync(rawdataavailable, Form1.action);
+                        SendAsync(rawdataavailable, Form1.actionaudio);
                     rawdataavailable = null;
                     Thread.Sleep(1);
                 }
@@ -331,7 +331,7 @@ namespace RemoteGameplayHost
                 {
                     try
                     {
-                        Send(Form1.rawdataavailable);
+                        SendAsync(Form1.rawdataavailable, actiondisplay);
                     }
                     catch { }
                     System.Threading.Thread.Sleep(50);
