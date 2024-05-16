@@ -2,9 +2,5 @@
 192.168.1.12
 // Port for display
 61000
-// Width
-1360
-//Height
-768
 // Port for display
 63000

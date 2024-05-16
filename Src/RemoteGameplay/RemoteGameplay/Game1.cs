@@ -8,6 +8,7 @@ using System.Runtime.InteropServices;
 using System.Windows.Forms;
 using NAudio.CoreAudioApi;
 using NAudio.Wave;
+using SharpDX.Direct3D9;
 
 namespace RemoteGameplay
 {
@@ -33,8 +34,7 @@ namespace RemoteGameplay
         private SpriteBatch _spriteBatch;
         private string ip, displayport, audioport;
         private WebSocket wsc1display;
-        private int width;
-        private int height;
+        private static int width = Screen.PrimaryScreen.Bounds.Width, height = Screen.PrimaryScreen.Bounds.Height;
         private Texture2D texture1 = null, texturetemp = null;
         private WebSocket wscaudio;
         private BufferedWaveProvider src;
@@ -50,10 +50,6 @@ namespace RemoteGameplay
                 ip = file.ReadLine();
                 file.ReadLine();
                 displayport = file.ReadLine();
-                file.ReadLine();
-                width = Convert.ToInt32(file.ReadLine());
-                file.ReadLine();
-                height = Convert.ToInt32(file.ReadLine());
                 file.ReadLine();
                 audioport = file.ReadLine();
                 _graphics = new GraphicsDeviceManager(this);
@@ -101,7 +97,7 @@ namespace RemoteGameplay
                 }
                 GraphicsDevice.Clear(Color.CornflowerBlue);
                 _spriteBatch.Begin();
-                _spriteBatch.Draw(texturetemp, new Vector2(0, 0), new Rectangle(0, 0, width, height), Color.White);
+                _spriteBatch.Draw(texturetemp, new Vector2(0, 0), new Rectangle(0, 0, texturetemp.Width, texturetemp.Height), Color.White, 0f, new Vector2(0, 0), new Vector2((float)width / (float)texturetemp.Width, (float)height / (float)texturetemp.Height), SpriteEffects.None, 1f);
                 _spriteBatch.End();
                 base.Draw(gameTime);
                 GC.Collect();
