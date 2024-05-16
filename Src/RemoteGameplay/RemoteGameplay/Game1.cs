@@ -35,7 +35,7 @@ namespace RemoteGameplay
         private WebSocket wsc1display;
         private int width;
         private int height;
-        private Texture2D texture1 = null;
+        private Texture2D texture1 = null, texturetemp = null;
         private WebSocket wscaudio;
         private BufferedWaveProvider src;
         private WasapiOut soundOut;
@@ -93,12 +93,20 @@ namespace RemoteGameplay
         }
         protected override void Draw(GameTime gameTime)
         {
-            GraphicsDevice.Clear(Color.CornflowerBlue);
-            _spriteBatch.Begin();
-            _spriteBatch.Draw(texture1, new Vector2(0, 0), new Rectangle(0, 0, width, height), Color.White);
-            _spriteBatch.End();
-            GC.Collect();
-            base.Draw(gameTime);
+            try
+            {
+                if (texture1 != null) 
+                {
+                    texturetemp = texture1;
+                }
+                GraphicsDevice.Clear(Color.CornflowerBlue);
+                _spriteBatch.Begin();
+                _spriteBatch.Draw(texturetemp, new Vector2(0, 0), new Rectangle(0, 0, width, height), Color.White);
+                _spriteBatch.End();
+                base.Draw(gameTime);
+                GC.Collect();
+            }
+            catch { }
         }
         public void Connect1Display()
         {
@@ -118,7 +126,11 @@ namespace RemoteGameplay
         }
         private void Ws_OnMessage1Display(object sender, MessageEventArgs e)
         {
-            texture1 = byteArrayToTexture(e.RawData);
+            try
+            {
+                texture1 = byteArrayToTexture(e.RawData);
+            }
+            catch { }
         }
         public void Disconnect1Display()
         {
@@ -129,11 +141,23 @@ namespace RemoteGameplay
         }
         private Texture2D byteArrayToTexture(byte[] imageBytes)
         {
-            using (var stream = new MemoryStream(imageBytes))
+            try
             {
-                stream.Seek(0, SeekOrigin.Begin);
-                var tx = Texture2D.FromStream(GraphicsDevice, stream);
-                return tx;
+                if (imageBytes.Length > 300)
+                {
+                    using (var stream = new MemoryStream(imageBytes))
+                    {
+                        stream.Seek(0, SeekOrigin.Begin);
+                        var tx = Texture2D.FromStream(GraphicsDevice, stream);
+                        return tx;
+                    }
+                }
+                else
+                    return null;
+            }
+            catch
+            {
+                return null;
             }
         }
         public void ConnectAudio()
@@ -169,7 +193,11 @@ namespace RemoteGameplay
         }
         private void Ws_OnMessageAudio(object sender, MessageEventArgs e)
         {
-            src.AddSamples(e.RawData, 0, e.RawData.Length);
+            try
+            {
+                src.AddSamples(e.RawData, 0, e.RawData.Length);
+            }
+            catch { }
         }
         public void DisconnectAudio()
         {
