@@ -20,17 +20,12 @@ namespace WindowTitleRemover
         }
         [DllImport("USER32.DLL")]
         public static extern int SetWindowLong(IntPtr hWnd, int nIndex, uint dwNewLong);
-        [DllImport("user32.dll", EntryPoint = "FindWindow", SetLastError = true)]
-        static extern IntPtr FindWindowByCaption(IntPtr ZeroOnly, string lpWindowName);
         [DllImport("user32.dll")]
         static extern bool DrawMenuBar(IntPtr hWnd);
         [DllImport("user32.dll", EntryPoint = "SetWindowPos")]
         public static extern IntPtr SetWindowPos(IntPtr hWnd, int hWndInsertAfter, int x, int Y, int cx, int cy, int wFlags);
         [DllImport("user32.dll")]
         static extern IntPtr GetForegroundWindow();
-        [DllImport("user32.dll")]
-        static extern int GetWindowText(IntPtr hWnd, StringBuilder text, int count);
-        private static string WINDOW_NAME = "";
         private const int GWL_STYLE = -16;
         private const uint WS_BORDER = 0x00800000;
         private const uint WS_CAPTION = 0x00C00000;
@@ -106,8 +101,7 @@ namespace WindowTitleRemover
                 {
                     width = Screen.PrimaryScreen.Bounds.Width;
                     height = Screen.PrimaryScreen.Bounds.Height;
-                    WINDOW_NAME = GetActiveWindowTitle();
-                    IntPtr window = FindWindowByCaption(IntPtr.Zero, WINDOW_NAME);
+                    IntPtr window = GetForegroundWindow();
                     SetWindowLong(window, GWL_STYLE, WS_SYSMENU);
                     SetWindowPos(window, -2, 0, 0, width, height, 0x0040);
                     DrawMenuBar(window);
@@ -115,25 +109,12 @@ namespace WindowTitleRemover
                 valchanged(1, Key_PAGE_UP);
                 if (wu[1] == 1)
                 {
-                    WINDOW_NAME = GetActiveWindowTitle();
-                    IntPtr window = FindWindowByCaption(IntPtr.Zero, WINDOW_NAME);
+                    IntPtr window = GetForegroundWindow();
                     SetWindowLong(window, GWL_STYLE, WS_CAPTION | WS_POPUP | WS_BORDER | WS_SYSMENU | WS_TABSTOP | WS_VISIBLE | WS_OVERLAPPED | WS_MINIMIZEBOX | WS_MAXIMIZEBOX);
                     DrawMenuBar(window);
                 }
                 System.Threading.Thread.Sleep(100);
             }
-        }
-        private static string GetActiveWindowTitle()
-        {
-            const int nChars = 256;
-            StringBuilder Buff = new StringBuilder(nChars);
-            IntPtr handle = GetForegroundWindow();
-
-            if (GetWindowText(handle, Buff, nChars) > 0)
-            {
-                return Buff.ToString();
-            }
-            return null;
         }
         private async void KeyboardHook_Hook(KeyboardHook.KBDLLHOOKSTRUCT keyboardStruct) { }
         public const int VK_LBUTTON = (int)0x01;
