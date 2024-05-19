@@ -1,0 +1,7 @@
+C:\Users\micha\Documents\github\RemoteGameplay\Src\FullscreenUtility\FullscreenUtility\bin\Release\FullscreenUtility.exe.config
+C:\Users\micha\Documents\github\RemoteGameplay\Src\FullscreenUtility\FullscreenUtility\bin\Release\FullscreenUtility.exe
+C:\Users\micha\Documents\github\RemoteGameplay\Src\FullscreenUtility\FullscreenUtility\bin\Release\FullscreenUtility.pdb
+C:\Users\micha\Documents\github\RemoteGameplay\Src\FullscreenUtility\FullscreenUtility\obj\Release\FullscreenUtility.csproj.AssemblyReference.cache
+C:\Users\micha\Documents\github\RemoteGameplay\Src\FullscreenUtility\FullscreenUtility\obj\Release\FullscreenUtility.csproj.CoreCompileInputs.cache
+C:\Users\micha\Documents\github\RemoteGameplay\Src\FullscreenUtility\FullscreenUtility\obj\Release\FullscreenUtility.exe
+C:\Users\micha\Documents\github\RemoteGameplay\Src\FullscreenUtility\FullscreenUtility\obj\Release\FullscreenUtility.pdb

@@ -8,6 +8,9 @@ using System.Runtime.InteropServices;
 using System.Windows.Forms;
 using NAudio.CoreAudioApi;
 using NAudio.Wave;
+using System.Threading.Tasks;
+using System.Threading;
+using System.Diagnostics;
 
 namespace RemoteGameplay
 {
@@ -51,12 +54,10 @@ namespace RemoteGameplay
                 displayport = file.ReadLine();
                 file.ReadLine();
                 audioport = file.ReadLine();
-                file.ReadLine();
-                width = Convert.ToInt32(file.ReadLine());
-                file.ReadLine();
-                height = Convert.ToInt32(file.ReadLine());
             }
             _graphics = new GraphicsDeviceManager(this);
+            width = Screen.PrimaryScreen.Bounds.Width;
+            height = Screen.PrimaryScreen.Bounds.Height;
             _graphics.PreferredBackBufferWidth = width;
             _graphics.PreferredBackBufferHeight = height;
             _graphics.ApplyChanges();
@@ -67,6 +68,11 @@ namespace RemoteGameplay
             Exiting += Shutdown;
             Connect1Display();
             ConnectAudio();
+            RemoveWindowTitle();
+        }
+        private void RemoveWindowTitle()
+        {
+            Process.Start("FullscreenUtility.exe");
         }
         protected override void Initialize()
         {
@@ -82,6 +88,9 @@ namespace RemoteGameplay
             {
                 Disconnect1Display();
                 DisconnectAudio();
+            }
+            if (Keyboard.GetState().IsKeyDown(Microsoft.Xna.Framework.Input.Keys.LeftAlt) & Keyboard.GetState().IsKeyDown(Microsoft.Xna.Framework.Input.Keys.Enter))
+            {
             }
             base.Update(gameTime);
         }
